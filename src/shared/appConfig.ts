@@ -1,0 +1,46 @@
+require('dotenv').config();
+
+export default {
+    PORT: Number(process.env.PORT) ?? 3000,
+    DB_HOST: process.env.DB_HOST ?? 'localhost',
+    DB_PORT: Number(process.env.DB_PORT) ?? 3000,
+    DB_USERNAME: process.env.DB_USERNAME ?? '',
+    DB_PASSWORD: process.env.DB_PASSWORD ?? '',
+    DB_NAME: process.env.DB_NAME ?? '',
+    MOODLE_URL: process.env.MOODLE_URL ?? '',
+    MOODLE_TOKEN: process.env.MOODLE_TOKEN ?? '',
+    EMAIL_HOST: String(process.env.EMAIL_HOST) ?? "sandbox.smtp.mailtrap.io",
+    EMAIL_PORT: process.env.EMAIL_PORT ?? 25,
+    EMAIL_USER: process.env.EMAIL_USER ?? "222b0d892997f1",
+    EMAIL_PASS: process.env.EMAIL_PASS ?? "44f6c1b56636b7",
+    FROM_EMAIL: process.env.FROM_EMAIL ?? "test@funiber.org",
+    ACADEMIC_RECORD_API_URL: process.env.ACADEMIC_RECORD_API_URL ?? '',
+    EDUCATIONAL_SYNC_URL: process.env.EDUCATIONAL_SYNC_URL ?? '',
+    INSCRIPTION_DELAY_MINUTES: process.env.INSCRIPTION_DELAY_MINUTES ? Number(process.env.INSCRIPTION_DELAY_MINUTES) : 5,
+    RABBIT_USERNAME: process.env.RABBIT_USERNAME ?? '',
+    RABBIT_PASSWORD: process.env.RABBIT_PASSWORD ?? '',
+    RABBIT_PROTOCOL: process.env.RABBIT_PROTOCOL ?? '',
+    RABBIT_HOSTNAME: process.env.RABBIT_HOSTNAME ?? '',
+    RABBIT_PORT: process.env.RABBIT_PORT ?? 5672,
+    RABBIT_VHOST: process.env.RABBIT_VHOST ?? '/',
+    RABBIT_QUEUE: process.env.RABBIT_QUEUE ?? 'domain-name.subdomain-name',
+    RABBIT_ROUTING_KEY: process.env.RABBIT_ROUTING_KEY ?? 'sagittarius-a',
+    RABBIT_EXCHANGE: process.env.RABBIT_EXCHANGE ?? 'sagittarius-a',
+    RABBIT_DIRECT_EXCHANGE: process.env.RABBIT_DIRECT_EXCHANGE ?? 'sagittarius-a-direct',
+    RABBIT_TYPE_EXCHANGE: process.env.RABBIT_TYPE_EXCHANGE ?? 'fanout',
+    RABBIT_TYPE_DIRECT_EXCHANGE: process.env.RABBIT_TYPE_DIRECT_EXCHANGE ?? 'direct',
+    RABBIT_PREFETCH: Number(process.env.RABBIT_PREFETCH) ?? 1,
+    //rabbit retry
+    RABBIT_RETRY_QUEUE: process.env.RABBIT_RETRY_QUEUE ?? 'domain-name.subdomain-name.events-retry',
+    RABBIT_RETRY_ROUTING_KEY: process.env.RABBIT_RETRY_ROUTING_KEY ?? 'domain-name.subdomain-name.events-retry',
+    RABBIT_RETRY_ENDPOINT: process.env.RABBIT_RETRY_ENDPOINT ?? 'teaching-action.service',
+    RABBIT_MESSAGE_TTL:Number( process.env.RABBIT_MESSAGE_TTL) ?? 10000,
+    //rabbit dead letter
+    RABBIT_DEAD_LETTER_QUEUE: process.env.RABBIT_DEAD_LETTER_QUEUE ?? 'domain-name.dead-letter',
+    RABBIT_DEAD_LETTER_ROUTING_KEY: process.env.RABBIT_DEAD_LETTER_ROUTING_KEY ?? 'domain-name.dead-letter',
+
+    //rabbit resilience
+    IMMEDIATE_RETRY_ATTEMPTS: process.env.IMMEDIATE_RETRY_ATTEMPTS ?? 5,
+    DELAYED_RETRY_ATTEMPTS: process.env.DELAYED_RETRY_ATTEMPTS ?? 3,
+    DELAY_IN_MS: process.env.DELAY_IN_MS ?? 1000,
+}
