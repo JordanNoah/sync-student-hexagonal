@@ -24,7 +24,7 @@ export class Server {
     public async start() {
         try {
             DbSequelize().then(async () => {
-                RabbitMQR.init().then(() => {
+                
                     //TODO: Uncomment this line to run the migration
                     //await new AcademicElementMigration().migrate()
 
@@ -49,9 +49,7 @@ export class Server {
                     })
                     //initialize socket manager
                     RabbitMQResilienceSocketManager.initialize(server, '/websocket/')
-                }).catch(error => {
-                    throw CustomError.internalServer(error)
-                })
+                    await RabbitMQR.init()
             }).catch(error => {
                 console.log(error)
             })

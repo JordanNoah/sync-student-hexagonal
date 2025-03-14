@@ -36,7 +36,7 @@ export class InscriptionSequelize extends Model<InscriptionRow, Omit<Inscription
     declare status: string
     declare lang: string
     declare registeredAt: Date
-    declare introductoryModule: string | null
+    declare introductoryModule?: string
     declare programStartedAt: Date
     declare programFinishedAt: Date
     declare extensionFinishedAt: Date

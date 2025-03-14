@@ -8,6 +8,8 @@ import {
     InstitutionSequelize
 } from "./models"
 
+import {InboxEventSequelize,OutboxEventSequelize,EventProcessLogSequelize} from "rabbitmq-resilience/dist/infrastructure/database/models/eventManager/index"
+
 export const DbSequelize = async () => {
     try {
         // Code to connect to the database

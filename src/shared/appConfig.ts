@@ -16,7 +16,7 @@ export default {
     FROM_EMAIL: process.env.FROM_EMAIL ?? "test@funiber.org",
     ACADEMIC_RECORD_API_URL: process.env.ACADEMIC_RECORD_API_URL ?? '',
     EDUCATIONAL_SYNC_URL: process.env.EDUCATIONAL_SYNC_URL ?? '',
-    INSCRIPTION_DELAY_MINUTES: process.env.INSCRIPTION_DELAY_MINUTES ? Number(process.env.INSCRIPTION_DELAY_MINUTES) : 5,
+    TRANSACTION_DELAY_MINUTES: process.env.TRANSACTION_DELAY_MINUTES ? Number(process.env.TRANSACTION_DELAY_MINUTES) : 5,
     RABBIT_USERNAME: process.env.RABBIT_USERNAME ?? '',
     RABBIT_PASSWORD: process.env.RABBIT_PASSWORD ?? '',
     RABBIT_PROTOCOL: process.env.RABBIT_PROTOCOL ?? '',
