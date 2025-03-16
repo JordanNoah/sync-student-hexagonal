@@ -23,4 +23,16 @@ export default class AcademicSelectionElementEventDto {
         }
         return [undefined, new AcademicSelectionElementEventDto(uuid, enrollment_uuid, academic_element_uuid)]
     }
+
+    static scheduled(object: { [key: string]: any }): [string?, AcademicSelectionElementEventDto?] {
+        const {uuid, enrollment_uuid, academic_element_uuid, started_at, finished_at} = object
+        const messageErrorComplement = 'missing in academicSelectionElement structure'
+        if (!uuid) return [`uuid ${messageErrorComplement}`, undefined]
+        if (!enrollment_uuid) return [`enrollment_uuid ${messageErrorComplement}`, undefined]
+        if (!academic_element_uuid) return [`academic_element_uuid ${messageErrorComplement}`, undefined]
+        if (!started_at) return [`started_at ${messageErrorComplement}`, undefined]
+        if (!finished_at) return [`finished_at ${messageErrorComplement}`, undefined]
+
+        return [undefined, new AcademicSelectionElementEventDto(uuid, enrollment_uuid, academic_element_uuid, undefined, started_at, finished_at)]
+    }
 }

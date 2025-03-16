@@ -8,7 +8,7 @@ import InscriptionEntity from "@/domain/entity/inscription.entity";
 export default class InscriptionDatasourceImpl implements InscriptionDatasource {
     async createUpdate(inscriptionEventDto: InscriptionEventDto): Promise<InscriptionEntity> {
         try {
-            const processWhen = addMinutes(inscriptionEventDto.inscription.registeredAt)
+            const processWhen = addMinutes(inscriptionEventDto.inscription.registeredAt!)
 
             const [inscriptionDb, created] = await InscriptionSequelize.findOrCreate({
                 where: {
@@ -17,18 +17,18 @@ export default class InscriptionDatasourceImpl implements InscriptionDatasource 
                 defaults: {
                     uuid: inscriptionEventDto.inscription.uuid,
                     studentUuid: inscriptionEventDto.inscription.studentUuid,
-                    programUuid: inscriptionEventDto.inscription.academicProgram.programUuid,
-                    programVersionUuid: inscriptionEventDto.inscription.academicProgram.programVersionUuid,
+                    programUuid: inscriptionEventDto.inscription.academicProgram!.programUuid,
+                    programVersionUuid: inscriptionEventDto.inscription.academicProgram!.programVersionUuid,
                     eventReceivingQueueUuid: inscriptionEventDto.uuid,
-                    institutionAbbreviation: inscriptionEventDto.inscription.institutionAbbreviation,
-                    modality: inscriptionEventDto.inscription.modality,
-                    status: inscriptionEventDto.inscription.status,
-                    lang: inscriptionEventDto.inscription.contentLanguage,
-                    registeredAt: inscriptionEventDto.inscription.registeredAt,
+                    institutionAbbreviation: inscriptionEventDto.inscription.institutionAbbreviation!,
+                    modality: inscriptionEventDto.inscription.modality!,
+                    status: inscriptionEventDto.inscription.status!,
+                    lang: inscriptionEventDto.inscription.contentLanguage!,
+                    registeredAt: inscriptionEventDto.inscription.registeredAt!,
                     introductoryModule: inscriptionEventDto.inscription.introductoryModule?.academicElementUuid,
-                    programStartedAt: inscriptionEventDto.inscription.programStartedAt,
-                    programFinishedAt: inscriptionEventDto.inscription.programFinishedAt,
-                    extensionFinishedAt: inscriptionEventDto.inscription.extensionFinishedAt,
+                    programStartedAt: inscriptionEventDto.inscription.programStartedAt!,
+                    programFinishedAt: inscriptionEventDto.inscription.programFinishedAt!,
+                    extensionFinishedAt: inscriptionEventDto.inscription.extensionFinishedAt!,
                     processWhen: processWhen,
                     processed: false
                 }
@@ -36,18 +36,18 @@ export default class InscriptionDatasourceImpl implements InscriptionDatasource 
             if (!created) {
                 inscriptionDb.uuid = inscriptionEventDto.inscription.uuid
                 inscriptionDb.studentUuid = inscriptionEventDto.inscription.studentUuid
-                inscriptionDb.programUuid = inscriptionEventDto.inscription.academicProgram.programUuid
-                inscriptionDb.programVersionUuid = inscriptionEventDto.inscription.academicProgram.programVersionUuid
+                inscriptionDb.programUuid = inscriptionEventDto.inscription.academicProgram!.programUuid
+                inscriptionDb.programVersionUuid = inscriptionEventDto.inscription.academicProgram!.programVersionUuid
                 inscriptionDb.eventReceivingQueueUuid = inscriptionEventDto.uuid
-                inscriptionDb.institutionAbbreviation = inscriptionEventDto.inscription.institutionAbbreviation
-                inscriptionDb.modality = inscriptionEventDto.inscription.modality
+                inscriptionDb.institutionAbbreviation = inscriptionEventDto.inscription.institutionAbbreviation!
+                inscriptionDb.modality = inscriptionEventDto.inscription.modality!
                 inscriptionDb.introductoryModule = inscriptionEventDto.inscription.introductoryModule?.academicElementUuid
-                inscriptionDb.status = inscriptionEventDto.inscription.status
-                inscriptionDb.lang = inscriptionEventDto.inscription.contentLanguage
-                inscriptionDb.registeredAt = inscriptionEventDto.inscription.registeredAt
-                inscriptionDb.programStartedAt = inscriptionEventDto.inscription.programStartedAt
-                inscriptionDb.programFinishedAt = inscriptionEventDto.inscription.programFinishedAt
-                inscriptionDb.extensionFinishedAt = inscriptionEventDto.inscription.extensionFinishedAt
+                inscriptionDb.status = inscriptionEventDto.inscription.status!
+                inscriptionDb.lang = inscriptionEventDto.inscription.contentLanguage!
+                inscriptionDb.registeredAt = inscriptionEventDto.inscription.registeredAt!
+                inscriptionDb.programStartedAt = inscriptionEventDto.inscription.programStartedAt!
+                inscriptionDb.programFinishedAt = inscriptionEventDto.inscription.programFinishedAt!
+                inscriptionDb.extensionFinishedAt = inscriptionEventDto.inscription.extensionFinishedAt!
                 inscriptionDb.processWhen = processWhen
                 inscriptionDb.processed = false
                 await inscriptionDb.save()
@@ -56,6 +56,37 @@ export default class InscriptionDatasourceImpl implements InscriptionDatasource 
 
             return InscriptionEntity.fromRow(inscriptionDb)
         }catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async getByUuid(uuid: string): Promise<InscriptionEntity | null> {
+        try {
+            const inscriptionDb = await InscriptionSequelize.findOne({
+                where: {
+                    uuid: uuid
+                }
+            })
+            if (!inscriptionDb) return null
+            return InscriptionEntity.fromRow(inscriptionDb)
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async updateByEntity(inscriptionEntity: InscriptionEntity): Promise<InscriptionEntity> {
+        try {
+            
+            await InscriptionSequelize.update(inscriptionEntity,{
+                where: {
+                    uuid: inscriptionEntity.uuid
+                }
+            })
+
+            return inscriptionEntity
+        } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);
         }

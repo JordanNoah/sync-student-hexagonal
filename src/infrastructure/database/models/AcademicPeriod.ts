@@ -5,8 +5,8 @@ interface AcademicPeriodRow {
     id: number,
     uuid: string,
     name: string,
-    startDate: string,
-    endDate: string | null,
+    startDate: Date,
+    endDate: Date | null,
     createdAt?: Date,
     updatedAt?: Date,
     deletedAt?: Date | null
@@ -16,8 +16,8 @@ export class AcademicPeriodSequelize extends Model<AcademicPeriodRow,Omit<Academ
     declare id: number
     declare uuid: string
     declare name: string
-    declare startDate: string
-    declare endDate: string | null
+    declare startDate: Date
+    declare endDate: Date | null
     declare readonly createdAt: Date
     declare readonly updatedAt: Date
     declare readonly deletedAt: Date

@@ -5,17 +5,18 @@ export default class InscriptionElementEventDto {
     constructor(
         public uuid: string,
         public studentUuid: string,
-        public academicProgram: InscriptionAcademicProgramEventDto,
-        public introductoryModule: InscriptionIntroductoryModuleEventDto | null,
-        public institutionAbbreviation: string,
-        public modality: string,
-        public status: string,
-        public contentLanguage: string,
-        public createdAt: Date,
-        public registeredAt: Date,
-        public programStartedAt: Date,
-        public programFinishedAt: Date,
-        public extensionFinishedAt: Date,
+        public academicProgram?: InscriptionAcademicProgramEventDto,
+        public introductoryModule?: InscriptionIntroductoryModuleEventDto | null,
+        public institutionAbbreviation?: string,
+        public modality?: string,
+        public status?: string,
+        public contentLanguage?: string,
+        public createdAt?: Date,
+        public registeredAt?: Date,
+        public programStartedAt?: Date,
+        public programFinishedAt?: Date,
+        public extensionFinishedAt?: Date,
+        public newDate?: Date
     ){}
 
     static registered(object: { [key: string]: any }): [string?, InscriptionElementEventDto?] {
@@ -62,5 +63,29 @@ export default class InscriptionElementEventDto {
                 new Date(extension_finished_at)
             )
         ]
+    }
+
+    static newDate(object: { [key: string]: any }): [string?,InscriptionElementEventDto?] {
+        const {uuid, student_uuid, new_date} = object
+        const messageErrorComplement = 'missing in inscription structure'
+        if (!uuid) return [`uuid ${messageErrorComplement}`, undefined]
+        if (!student_uuid) return [`student_uuid ${messageErrorComplement}`, undefined]
+        if (!new_date) return [`new_date ${messageErrorComplement}`, undefined]
+        return [undefined, new InscriptionElementEventDto(
+            uuid,
+            student_uuid,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            new_date
+        )]
     }
 }

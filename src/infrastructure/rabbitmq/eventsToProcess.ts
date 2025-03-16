@@ -43,15 +43,33 @@ export const eventsToProcess: EventProcessConfig[] = [
             }
         ]
     },
-    //{
-    //    eventType: appConstants.PROCESSOR.INSCRIPTION.REGISTRATIONDATEESTABLISHED,
-    //    processes: [
-    //        {
-    //            processFunction: async (event: RabbitMQMessageDto) => await new RabbitProcessorDatasourceImpl().RegistrationDateEstablished(event),
-    //            processName: 'process-registration-date-established'
-    //        }
-    //    ]
-    //},
+    {
+        eventType: appConstants.PROCESSOR.ENROLLMENT.ACADEMICSELECTIONASSOCIATEDSCHEDULED,
+        processes: [
+            {
+                processFunction: async (event: RabbitMQMessageDto) => await new RabbitProcessorDatasourceImpl().AcademicSelectionScheduled(event),
+                processName: 'process-academic-selection-associated-scheduled'
+            }
+        ]
+    },
+    {
+        eventType: appConstants.PROCESSOR.ACADEMICOFFERS.PROGRAMOFFERED,
+        processes: [
+            {
+                processFunction: async (event: RabbitMQMessageDto) => await new RabbitProcessorDatasourceImpl().ProgramOffered(event),
+                processName: 'process-program-offered'
+            }
+        ]
+    },
+    {
+        eventType: appConstants.PROCESSOR.INSCRIPTION.REGISTRATIONDATEESTABLISHED,
+        processes: [
+            {
+                processFunction: async (event: RabbitMQMessageDto) => await new RabbitProcessorDatasourceImpl().RegistrationDateEstablished(event),
+                processName: 'process-registration-date-established'
+            }
+        ]
+    },
     //{
     //    eventType: appConstants.PROCESSOR.INSCRIPTION.PROGRAMSTARTDATEESTABLISHED,
     //    processes: [
@@ -125,15 +143,6 @@ export const eventsToProcess: EventProcessConfig[] = [
     //    ]
     //},
     //{
-    //    eventType: appConstants.PROCESSOR.ENROLLMENT.ACADEMICSELECTIONASSOCIATEDSCHEDULED,
-    //    processes: [
-    //        {
-    //            processFunction: async (event: RabbitMQMessageDto) => await new RabbitProcessorDatasourceImpl().AcademicSelectionScheduled(event),
-    //            processName: 'process-academic-selection-associated-scheduled'
-    //        }
-    //    ]
-    //},
-    //{
     //    eventType: appConstants.PROCESSOR.DEGREE.DEGREEDINACTIVATED,
     //    processes: [
     //        {
@@ -157,15 +166,6 @@ export const eventsToProcess: EventProcessConfig[] = [
     //        {
     //            processFunction: async (event: RabbitMQMessageDto) => await new SignUpProcessor().process(JSON.parse(event.content.toString())),
     //            processName: 'process-student-signed-up'
-    //        }
-    //    ]
-    //},
-    //{
-    //    eventType: appConstants.PROCESSOR.ACADEMICOFFERS.PROGRAMOFFERED,
-    //    processes: [
-    //        {
-    //            processFunction: async (event: RabbitMQMessageDto) => await new RabbitProcessorDatasourceImpl().ProgramOffered(event),
-    //            processName: 'process-program-offered'
     //        }
     //    ]
     //}

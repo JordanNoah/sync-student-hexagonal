@@ -7,6 +7,10 @@ import EnrollmentDatasourceImpl from "./enrollment.datasource.impl";
 import EnrollmentEventDto from "@/domain/dtos/enrollment/enrollment.event.dto";
 import AcademicSelectionEventDto from "@/domain/dtos/academicSelection/academicSelection.event.dto";
 import AcademicSelectionDatasourceImpl from "./academicSelection.datasource.impl";
+import DegreeEventDto from "@/domain/dtos/degree/degree.event.dto";
+import DegreeDatasourceImpl from "./degree.datasource.impl";
+import ProgramOfferedEventDto from "@/domain/dtos/programOffered/programOffered.event.dto";
+import ProgramOfferedDatasourceImpl from "./programOffered.datasource.impl";
 
 export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDatasource {
     async InscriptioRegisteredProcessor(message: RabbitMQMessageDto): Promise<void> {
@@ -38,15 +42,31 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
     AcademicSelectionDiscarded(message: RabbitMQMessageDto): Promise<void> {
         throw new Error("Method not implemented.");
     }
-    AcademicSelectionScheduled(message: RabbitMQMessageDto): Promise<void> {
-        throw new Error("Method not implemented.");
+    async AcademicSelectionScheduled(message: RabbitMQMessageDto): Promise<void> {
+        try {
+            const content = JSON.parse(message.content.toString());
+            const [errorAcademic, academicSelection] = AcademicSelectionEventDto.scheduled(content);
+            if (errorAcademic) {
+                throw CustomError.internalServer(errorAcademic)
+            }
+
+            await new AcademicSelectionDatasourceImpl().createUpdate(academicSelection!);
+        } catch (error) {
+            return CustomError.throwAnError(error) ?? Promise.resolve();
+        }
     }
     DegreeDeactivated(message: RabbitMQMessageDto): Promise<void> {    
         throw new Error("Method not implemented.");
     }
-    DegreeRegistered(message: RabbitMQMessageDto): Promise<void> {
+    async DegreeRegistered(message: RabbitMQMessageDto): Promise<void> {
         try {
             const content = JSON.parse(message.content.toString());
+            const [errorDegree, degreeEventDto] = DegreeEventDto.create(content);
+            if (errorDegree) {
+                throw CustomError.internalServer(errorDegree)
+            }
+
+            await new DegreeDatasourceImpl().createUpdate(degreeEventDto!);
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
@@ -86,13 +106,41 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
     ProgramEndDateEstablished(message: RabbitMQMessageDto): Promise<void> {
         throw new Error("Method not implemented.");
     }
-    ProgramOffered(message: RabbitMQMessageDto): Promise<void> {
-        throw new Error("Method not implemented.");
+    async ProgramOffered(message: RabbitMQMessageDto): Promise<void> {
+        try {
+            const content = JSON.parse(message.content.toString());
+            const [errorProgramOfferd, programOfferedDto] = ProgramOfferedEventDto.create(content);
+            if (errorProgramOfferd) {
+                throw CustomError.internalServer(errorProgramOfferd)
+            }
+
+            for (const offer of programOfferedDto!.offers) {
+                await new ProgramOfferedDatasourceImpl().createUpdate(offer.academicPeriod);
+            }
+        } catch (error) {
+            return CustomError.throwAnError(error) ?? Promise.resolve();
+        }
     }
     ProgramStartDateEstablished(message: RabbitMQMessageDto): Promise<void> {
         throw new Error("Method not implemented.");
     }
-    RegistrationDateEstablished(message: RabbitMQMessageDto): Promise<void> {
-        throw new Error("Method not implemented.");
+    async RegistrationDateEstablished(message: RabbitMQMessageDto): Promise<void> {
+        try {
+            const content = JSON.parse(message.content.toString());
+            const [error, inscriptionDto] = InscriptionEventDto.newDate(content);
+            if (error) {
+                throw CustomError.internalServer(error)
+            }
+
+            const inscriptionEntity = await new InscriptionDatasourceImpl().getByUuid(inscriptionDto!.uuid);
+            if (!inscriptionEntity) {
+                throw CustomError.notFound(`Inscription with uuid ${inscriptionDto!.uuid} not found`)
+            }
+
+            inscriptionEntity.registeredAt = inscriptionDto!.inscription.newDate!;
+            await new InscriptionDatasourceImpl().updateByEntity(inscriptionEntity);
+        } catch (error) {
+            return CustomError.throwAnError(error) ?? Promise.resolve();
+        }
     }
 }

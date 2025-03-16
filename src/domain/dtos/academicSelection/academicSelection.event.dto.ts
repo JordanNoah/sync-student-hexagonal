@@ -19,4 +19,18 @@ export default class AcademicSelectionEventDto {
 
         return [undefined, new AcademicSelectionEventDto(uuid, new Date(fired_at), academicSelectionElement!)]
     }
+
+    static scheduled(object: { [key: string]: any }): [string?, AcademicSelectionEventDto?] {
+        const {uuid, fired_at, academic_selection} = object
+        const messageErrorComplement = 'missing in academicSelection structure'
+        if (!uuid) return [`uuid ${messageErrorComplement}`, undefined]
+        if (!fired_at) return [`fired_at ${messageErrorComplement}`, undefined]
+        if (!academic_selection) return [`academic_selection ${messageErrorComplement}`, undefined]
+
+        const [error, academicSelectionElement] = AcademicSelectionElementEventDto.scheduled(academic_selection)
+        if (error) return [error, undefined]
+
+        return [undefined, new AcademicSelectionEventDto(uuid, new Date(fired_at), academicSelectionElement!)]
+    }
+
 }
