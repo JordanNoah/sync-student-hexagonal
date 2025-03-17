@@ -1,4 +1,5 @@
 import { DegreeSequelize } from "@/infrastructure/database/models";
+import InstitutionEntity from "./institution.entity";
 
 export default class DegreeEntity {
     constructor(
@@ -8,7 +9,8 @@ export default class DegreeEntity {
         public instituionComing: string,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
-        public readonly deletedAt: Date
+        public readonly deletedAt: Date,
+        public institution?: InstitutionEntity
     ){}
 
     static fromRow(row: DegreeSequelize): DegreeEntity {
@@ -19,7 +21,8 @@ export default class DegreeEntity {
             row.instituionComing,
             row.createdAt,
             row.updatedAt,
-            row.deletedAt
+            row.deletedAt,
+            row.institution
         )
     }
 }

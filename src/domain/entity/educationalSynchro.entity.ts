@@ -14,12 +14,12 @@ export class StudentEntity {
         return new StudentEntity(
             object.username,
             object.password,
-            object.firstName,
-            object.lastName,
+            object.first_name,
+            object.last_name,
             object.email,
-            object.id,
-            object.idnumber,
-            object.uuid
+            object.external_id,
+            object.id_number,
+            object.id_number
         )
     }
 }

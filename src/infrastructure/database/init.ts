@@ -9,6 +9,7 @@ import {
 } from "./models"
 
 import {InboxEventSequelize,OutboxEventSequelize,EventProcessLogSequelize} from "rabbitmq-resilience/dist/infrastructure/database/models/eventManager/index"
+import { InstitutionSeederExec } from "./seeders/exec/institution.seeder.exec"
 
 export const DbSequelize = async () => {
     try {
@@ -19,6 +20,8 @@ export const DbSequelize = async () => {
         await EnrollmentSequelize.sync()
         await InscriptionSequelize.sync()
         await InstitutionSequelize.sync()
+
+        await new InstitutionSeederExec().up()
     }catch (error: any) {
         throw CustomError.internalServer(error)
     }

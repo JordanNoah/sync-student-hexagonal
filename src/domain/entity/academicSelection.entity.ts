@@ -1,4 +1,5 @@
 import { AcademicSelectionSequelize } from "@/infrastructure/database/models";
+import AcademicPeriodEntity from "./academicPeriod.entity";
 
 export default class AcademicSelectionEntity {
     constructor(
@@ -13,6 +14,7 @@ export default class AcademicSelectionEntity {
         public finishedAt?: Date,
         public callUuid?: string,
         public processedAt?: Date | null,
+        public academicPeriod?: AcademicPeriodEntity
     ){}
 
     static fromRow(row: AcademicSelectionSequelize): AcademicSelectionEntity {

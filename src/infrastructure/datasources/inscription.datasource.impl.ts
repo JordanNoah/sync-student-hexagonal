@@ -8,6 +8,7 @@ import AcademicRecordEntity from "@/domain/entity/academicRecord.entity";
 import DegreeDatasourceImpl from "./degree.datasource.impl";
 import AcademicSelectionDatasourceImpl from "./academicSelection.datasource.impl";
 import EnrollmentDatasourceImpl from "./enrollment.datasource.impl";
+import { Op } from "sequelize";
 
 export default class InscriptionDatasourceImpl implements InscriptionDatasource {
     async createUpdate(inscriptionEventDto: InscriptionEventDto): Promise<InscriptionEntity> {
@@ -139,6 +140,39 @@ export default class InscriptionDatasourceImpl implements InscriptionDatasource 
                 }
             }
             return new AcademicRecordEntity(InscriptionEntity.fromRow(inscription))
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+    
+    async getNotProcessedAfterNow(): Promise<AcademicRecordEntity[]> {
+        try {
+            const academicRecords:AcademicRecordEntity[] = []
+            const inscriptions = await InscriptionSequelize.findAll({
+                where: {
+                    processWhen: {
+                        [Op.lt]: new Date(),
+                    },
+                    processed: false
+                }
+            })
+            
+            for (const inscription of inscriptions) {
+                const degrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscription.uuid)
+                if (degrees.length == 0) {
+                    continue
+                }
+                inscription.degrees = degrees
+                inscription.enrollments = await new EnrollmentDatasourceImpl().getByInscriptionUuid(inscription.uuid)
+                if (inscription.enrollments.length > 0) {
+                    for (const enrollment of inscription.enrollments) {
+                        enrollment.academicSelections = await new AcademicSelectionDatasourceImpl().getByEnrollmentUuid(enrollment.uuid)
+                    }
+                }
+                academicRecords.push(new AcademicRecordEntity(InscriptionEntity.fromRow(inscription)))
+            }
+            return academicRecords
         } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);
