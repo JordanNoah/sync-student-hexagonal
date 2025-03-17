@@ -37,5 +37,12 @@ class EnrollmentElementEventDto {
             new EnrollmentElementEventDto(uuid, student_uuid, inscription_uuid, academicProgram, academicTerm)
         ];
     }
+    static changeStatus(object) {
+        const { uuid } = object;
+        const messageErrorComplement = 'missing in enrollment structure';
+        if (!uuid)
+            return [`uuid ${messageErrorComplement}`, undefined];
+        return [undefined, new EnrollmentElementEventDto(uuid)];
+    }
 }
 exports.default = EnrollmentElementEventDto;

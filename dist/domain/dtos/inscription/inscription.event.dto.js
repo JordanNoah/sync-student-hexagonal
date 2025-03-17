@@ -24,5 +24,33 @@ class InscriptionEventDto {
             return [error, undefined];
         return [undefined, new InscriptionEventDto(uuid, new Date(fired_at), inscriptionElement)];
     }
+    static newDate(object) {
+        const { uuid, fired_at, inscription } = object;
+        const messageErrorComplement = 'missing in inscription structure';
+        if (!uuid)
+            return [`uuid ${messageErrorComplement}`, undefined];
+        if (!fired_at)
+            return [`fired_at ${messageErrorComplement}`, undefined];
+        if (!inscription)
+            return [`inscription ${messageErrorComplement}`, undefined];
+        const [error, inscriptionNewDateDto] = inscriptionElement_event_dto_1.default.newDate(inscription);
+        if (error)
+            return [error, undefined];
+        return [undefined, new InscriptionEventDto(uuid, new Date(fired_at), inscriptionNewDateDto)];
+    }
+    static changeStatus(object) {
+        const { uuid, fired_at, inscription } = object;
+        const messageErrorComplement = 'missing in inscription structure';
+        if (!uuid)
+            return [`uuid ${messageErrorComplement}`, undefined];
+        if (!fired_at)
+            return [`fired_at ${messageErrorComplement}`, undefined];
+        if (!inscription)
+            return [`inscription ${messageErrorComplement}`, undefined];
+        const [error, inscriptionElement] = inscriptionElement_event_dto_1.default.changeStatus(inscription);
+        if (error)
+            return [error, undefined];
+        return [undefined, new InscriptionEventDto(uuid, new Date(fired_at), inscriptionElement)];
+    }
 }
 exports.default = InscriptionEventDto;

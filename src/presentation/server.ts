@@ -6,6 +6,7 @@ import { RabbitMQResilienceRoutes, RabbitMQResilienceSocketManager } from "rabbi
 import { serve } from "@hono/node-server";
 import { RabbitMQR } from "@/infrastructure/rabbitmq";
 import { CustomError } from "@/domain/errors/custom.error";
+import AppRoutes from "./routes";
 
 interface Options {
     port?: number
@@ -40,7 +41,7 @@ export class Server {
                         });
                     });
 
-                    this.app.route('/', new RabbitMQResilienceRoutes().routes)
+                    this.app.route('/api', new AppRoutes().routes)
                     const  server = serve({
                         fetch: this.app.fetch,
                         port: this.port

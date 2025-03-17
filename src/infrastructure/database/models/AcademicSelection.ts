@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../sequelize";
+import AcademicSelectionEntity from "@/domain/entity/academicSelection.entity";
 
 interface AcademicSelectionRow {
     id: number,
@@ -27,6 +28,7 @@ export class AcademicSelectionSequelize extends Model<AcademicSelectionRow, Omit
     declare readonly createdAt: Date
     declare readonly updatedAt: Date
     declare readonly deletedAt: Date
+    declare academicSelections?: AcademicSelectionEntity[]
 }
 
 AcademicSelectionSequelize.init({

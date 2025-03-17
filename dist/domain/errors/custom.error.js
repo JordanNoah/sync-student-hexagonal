@@ -16,6 +16,7 @@ class CustomError extends Error {
         return new CustomError('Sequelize error detected: ' + message);
     }
     static throwAnError(error) {
+        console.log(error);
         if (error instanceof CustomError) {
             throw error;
         }

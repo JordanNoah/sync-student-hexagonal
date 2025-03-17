@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const inscriptionAcademicProgram_event_dto_1 = __importDefault(require("./inscriptionAcademicProgram.event.dto"));
 const inscriptionIntroductoryModule_event_dto_1 = __importDefault(require("./inscriptionIntroductoryModule.event.dto"));
 class InscriptionElementEventDto {
-    constructor(uuid, studentUuid, academicProgram, introductoryModule, institutionAbbreviation, modality, status, contentLanguage, createdAt, registeredAt, programStartedAt, programFinishedAt, extensionFinishedAt) {
+    constructor(uuid, studentUuid, academicProgram, introductoryModule, institutionAbbreviation, modality, status, contentLanguage, createdAt, registeredAt, programStartedAt, programFinishedAt, extensionFinishedAt, newDate) {
         this.uuid = uuid;
         this.studentUuid = studentUuid;
         this.academicProgram = academicProgram;
@@ -20,6 +20,7 @@ class InscriptionElementEventDto {
         this.programStartedAt = programStartedAt;
         this.programFinishedAt = programFinishedAt;
         this.extensionFinishedAt = extensionFinishedAt;
+        this.newDate = newDate;
     }
     static registered(object) {
         const { uuid, student_uuid, academic_program, introductory_module, institution_abbreviation, modality, status, content_language, created_at, registered_at, program_started_at, program_finished_at, extension_finished_at } = object;
@@ -62,6 +63,26 @@ class InscriptionElementEventDto {
             undefined,
             new InscriptionElementEventDto(uuid, student_uuid, academicProgram, introductoryModuleDto, institution_abbreviation, modality, status, content_language, new Date(created_at), new Date(registered_at), new Date(program_started_at), new Date(program_finished_at), new Date(extension_finished_at))
         ];
+    }
+    static newDate(object) {
+        const { uuid, student_uuid, new_date } = object;
+        const messageErrorComplement = 'missing in inscription structure';
+        if (!uuid)
+            return [`uuid ${messageErrorComplement}`, undefined];
+        if (!student_uuid)
+            return [`student_uuid ${messageErrorComplement}`, undefined];
+        if (!new_date)
+            return [`new_date ${messageErrorComplement}`, undefined];
+        return [undefined, new InscriptionElementEventDto(uuid, student_uuid, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, new_date)];
+    }
+    static changeStatus(object) {
+        const { uuid, student_uuid } = object;
+        const messageErrorComplement = 'missing in inscription structure';
+        if (!uuid)
+            return [`uuid ${messageErrorComplement}`, undefined];
+        if (!student_uuid)
+            return [`student_uuid ${messageErrorComplement}`, undefined];
+        return [undefined, new InscriptionElementEventDto(uuid, student_uuid)];
     }
 }
 exports.default = InscriptionElementEventDto;

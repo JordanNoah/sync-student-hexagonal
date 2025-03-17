@@ -32,4 +32,49 @@ export default class DegreeDatasourceImpl implements DegreeDatasource {
             return Promise.reject(error);
         }
     }
+
+    async getByUuid(uuid: string): Promise<DegreeEntity | null> {
+        try {
+            const degree = await DegreeSequelize.findOne({
+                where: {
+                    uuid
+                }
+            })
+
+            if (!degree) return null
+
+            return DegreeEntity.fromRow(degree)
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async deleteById(id: number): Promise<void> {
+        try {
+            await DegreeSequelize.destroy({
+                where: {
+                    id
+                }
+            })
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async getByInscriptionUuid(inscriptionUuid: string): Promise<DegreeEntity[]> {
+        try {
+            const degrees = await DegreeSequelize.findAll({
+                where: {
+                    inscriptionUuid
+                }
+            })
+
+            return degrees.map(degree => DegreeEntity.fromRow(degree))
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
 }

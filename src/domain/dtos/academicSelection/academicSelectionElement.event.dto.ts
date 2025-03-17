@@ -4,7 +4,7 @@ export default class AcademicSelectionElementEventDto {
     constructor(
         public uuid: string,
         public enrollmentUuid: string,
-        public academicElementUuid: string,
+        public academicElementUuid?: string,
         public call?: AcademicSelectionCallEventDto,
         public startedAt?: Date,
         public finishedAt?: Date
@@ -34,5 +34,14 @@ export default class AcademicSelectionElementEventDto {
         if (!finished_at) return [`finished_at ${messageErrorComplement}`, undefined]
 
         return [undefined, new AcademicSelectionElementEventDto(uuid, enrollment_uuid, academic_element_uuid, undefined, started_at, finished_at)]
+    }
+
+    static changeStatus(object: { [key: string]: any }): [string?, AcademicSelectionElementEventDto?] {
+        const {uuid, enrollment_uuid} = object
+        const messageErrorComplement = 'missing in academicSelectionElement structure'
+        if (!uuid) return [`uuid ${messageErrorComplement}`, undefined]
+        if (!enrollment_uuid) return [`enrollment_uuid ${messageErrorComplement}`, undefined]
+
+        return [undefined, new AcademicSelectionElementEventDto(uuid, enrollment_uuid)]
     }
 }

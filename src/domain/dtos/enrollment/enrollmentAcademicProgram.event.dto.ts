@@ -2,7 +2,7 @@ export default class EnrollmentAcademicProgramEventDto {
     constructor(
         public programUuid: string,
         public programVersionUuid: string,
-        public version: string
+        public version?: string
     ){}
 
     static create(object: { [key: string]: any }): [string?, EnrollmentAcademicProgramEventDto?] {

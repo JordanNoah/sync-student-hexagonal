@@ -33,7 +33,6 @@ class EnrollmentDatasourceImpl {
                         academicTermUuid: enrollmentEventDto.enrollment.academicTerm.uuid,
                     }
                 });
-                console.log(created);
                 if (!created) {
                     enrollmentDb.uuid = enrollmentEventDto.enrollment.uuid;
                     enrollmentDb.studentUuid = enrollmentEventDto.enrollment.studentUuid;
@@ -46,6 +45,53 @@ class EnrollmentDatasourceImpl {
                     console.log("Enrollment record found, update applied instead...");
                 }
                 return enrollment_entity_1.default.fromRow(enrollmentDb);
+            }
+            catch (error) {
+                custom_error_1.CustomError.throwAnError(error);
+                return Promise.reject(error);
+            }
+        });
+    }
+    getByUuid(uuid) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const enrollmentDb = yield models_1.EnrollmentSequelize.findOne({
+                    where: {
+                        uuid
+                    }
+                });
+                return enrollmentDb ? enrollment_entity_1.default.fromRow(enrollmentDb) : null;
+            }
+            catch (error) {
+                custom_error_1.CustomError.throwAnError(error);
+                return Promise.reject(error);
+            }
+        });
+    }
+    deleteById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield models_1.EnrollmentSequelize.destroy({
+                    where: {
+                        id
+                    }
+                });
+            }
+            catch (error) {
+                custom_error_1.CustomError.throwAnError(error);
+                return Promise.reject(error);
+            }
+        });
+    }
+    updateByEntity(enrollmentEntity) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield models_1.EnrollmentSequelize.update(enrollmentEntity, {
+                    where: {
+                        uuid: enrollmentEntity.uuid
+                    }
+                });
+                return enrollmentEntity;
             }
             catch (error) {
                 custom_error_1.CustomError.throwAnError(error);

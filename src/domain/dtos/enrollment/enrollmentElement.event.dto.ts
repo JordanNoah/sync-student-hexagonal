@@ -4,10 +4,10 @@ import EnrollmentAcademicTermEventDto from "./enrollmentAcademicTerm.event.dto";
 export default class EnrollmentElementEventDto {
     constructor(
         public uuid: string,
-        public studentUuid: string,
-        public inscriptionUuid: string,
-        public academicProgram: EnrollmentAcademicProgramEventDto,
-        public academicTerm: EnrollmentAcademicTermEventDto
+        public studentUuid?: string,
+        public inscriptionUuid?: string,
+        public academicProgram?: EnrollmentAcademicProgramEventDto,
+        public academicTerm?: EnrollmentAcademicTermEventDto
     ){}
 
     static registered(object: { [key: string]: any }): [string?, EnrollmentElementEventDto?] {
@@ -35,5 +35,14 @@ export default class EnrollmentElementEventDto {
                 academicTerm!
             )
         ]
+    }
+
+    static changeStatus(object: { [key: string]: any }): [string?, EnrollmentElementEventDto?] {
+        const {uuid} = object
+        const messageErrorComplement = 'missing in enrollment structure'
+        if (!uuid) return [`uuid ${messageErrorComplement}`, undefined]
+        return [undefined, new EnrollmentElementEventDto(
+            uuid
+        )]
     }
 }

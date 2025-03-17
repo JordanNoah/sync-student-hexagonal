@@ -4,6 +4,10 @@ import { CustomError } from "@/domain/errors/custom.error";
 import { InscriptionSequelize } from "../database/models";
 import { addMinutes } from "@/shared/utils";
 import InscriptionEntity from "@/domain/entity/inscription.entity";
+import AcademicRecordEntity from "@/domain/entity/academicRecord.entity";
+import DegreeDatasourceImpl from "./degree.datasource.impl";
+import AcademicSelectionDatasourceImpl from "./academicSelection.datasource.impl";
+import EnrollmentDatasourceImpl from "./enrollment.datasource.impl";
 
 export default class InscriptionDatasourceImpl implements InscriptionDatasource {
     async createUpdate(inscriptionEventDto: InscriptionEventDto): Promise<InscriptionEntity> {
@@ -86,6 +90,55 @@ export default class InscriptionDatasourceImpl implements InscriptionDatasource 
             })
 
             return inscriptionEntity
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async getAcademicRecords(): Promise<AcademicRecordEntity[]> {
+        try {
+            const academicRecords:AcademicRecordEntity[] = []
+            const inscriptions = await InscriptionSequelize.findAll()
+            for (const inscription of inscriptions) {
+                const degrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscription.uuid)
+                
+                if (degrees.length == 0) {
+                    continue
+                }
+                inscription.degrees = degrees
+                inscription.enrollments = await new EnrollmentDatasourceImpl().getByInscriptionUuid(inscription.uuid)
+                if (inscription.enrollments.length > 0) {
+                    for (const enrollment of inscription.enrollments) {
+                        enrollment.academicSelections = await new AcademicSelectionDatasourceImpl().getByEnrollmentUuid(enrollment.uuid)
+                    }
+                }
+                academicRecords.push(new AcademicRecordEntity(InscriptionEntity.fromRow(inscription)))
+            }
+            return academicRecords
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async getAcademicRecordByUuid(uuid: string): Promise<AcademicRecordEntity | null> {
+        try {
+            const inscription = await InscriptionSequelize.findOne({
+                where: {
+                    uuid
+                }
+            })
+            if (!inscription) return null
+            const degrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscription.uuid)
+            inscription.degrees = degrees
+            inscription.enrollments = await new EnrollmentDatasourceImpl().getByInscriptionUuid(inscription.uuid)
+            if (inscription.enrollments.length > 0) {
+                for (const enrollment of inscription.enrollments) {
+                    enrollment.academicSelections = await new AcademicSelectionDatasourceImpl().getByEnrollmentUuid(enrollment.uuid)
+                }
+            }
+            return new AcademicRecordEntity(InscriptionEntity.fromRow(inscription))
         } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);

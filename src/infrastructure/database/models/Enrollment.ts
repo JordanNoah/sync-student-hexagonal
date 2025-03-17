@@ -1,5 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../sequelize";
+import AcademicRecordEntity from "@/domain/entity/academicRecord.entity";
+import AcademicSelectionEntity from "@/domain/entity/academicSelection.entity";
 
 interface EnrollmentRow {
     id: number,
@@ -27,6 +29,7 @@ export class EnrollmentSequelize extends Model<EnrollmentRow, Omit<EnrollmentRow
     declare readonly createdAt: Date
     declare readonly updatedAt: Date
     declare readonly deletedAt: Date
+    declare academicSelections?: AcademicSelectionEntity[]
 }
 
 EnrollmentSequelize.init({

@@ -1,4 +1,5 @@
 import { EnrollmentSequelize } from "@/infrastructure/database/models";
+import AcademicSelectionEntity from "./academicSelection.entity";
 
 export default class EnrollmentEntity {
     constructor(
@@ -12,7 +13,8 @@ export default class EnrollmentEntity {
         public academicTermUuid: string | null,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
-        public readonly deletedAt: Date
+        public readonly deletedAt: Date,
+        public academicSelections?: AcademicSelectionEntity[]
     ){}
 
     static fromRow(row: EnrollmentSequelize): EnrollmentEntity {
@@ -27,7 +29,8 @@ export default class EnrollmentEntity {
             row.academicTermUuid,
             row.createdAt,
             row.updatedAt,
-            row.deletedAt
+            row.deletedAt,
+            row.academicSelections
         )
     }
 }

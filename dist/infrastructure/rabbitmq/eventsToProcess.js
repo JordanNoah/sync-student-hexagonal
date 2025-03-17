@@ -30,6 +30,51 @@ exports.eventsToProcess = [
         ]
     },
     {
+        eventType: constants_1.default.PROCESSOR.ENROLLMENT.ENROLLMENTGENERATED,
+        processes: [
+            {
+                processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().EnrollmentGenerated(event); }),
+                processName: 'process-enrollment-generated'
+            }
+        ]
+    },
+    {
+        eventType: constants_1.default.PROCESSOR.ENROLLMENT.ACADEMICSELECTIONASSOCIATED,
+        processes: [
+            {
+                processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().AcademicSelectionAssociated(event); }),
+                processName: 'process-academic-selection-associated'
+            }
+        ]
+    },
+    {
+        eventType: constants_1.default.PROCESSOR.DEGREE.DEGREEREGISTERED,
+        processes: [
+            {
+                processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().DegreeRegistered(event); }),
+                processName: 'process-degree-registered'
+            }
+        ]
+    },
+    {
+        eventType: constants_1.default.PROCESSOR.ENROLLMENT.ACADEMICSELECTIONASSOCIATEDSCHEDULED,
+        processes: [
+            {
+                processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().AcademicSelectionScheduled(event); }),
+                processName: 'process-academic-selection-associated-scheduled'
+            }
+        ]
+    },
+    {
+        eventType: constants_1.default.PROCESSOR.ACADEMICOFFERS.PROGRAMOFFERED,
+        processes: [
+            {
+                processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().ProgramOffered(event); }),
+                processName: 'process-program-offered'
+            }
+        ]
+    },
+    {
         eventType: constants_1.default.PROCESSOR.INSCRIPTION.REGISTRATIONDATEESTABLISHED,
         processes: [
             {
@@ -84,29 +129,11 @@ exports.eventsToProcess = [
         ]
     },
     {
-        eventType: constants_1.default.PROCESSOR.ENROLLMENT.ENROLLMENTGENERATED,
-        processes: [
-            {
-                processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().EnrollmentGenerated(event); }),
-                processName: 'process-enrollment-generated'
-            }
-        ]
-    },
-    {
         eventType: constants_1.default.PROCESSOR.ENROLLMENT.ENROLLMENTDISCARDED,
         processes: [
             {
                 processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().EnrollmentDiscarded(event); }),
                 processName: 'process-enrollment-discarded'
-            }
-        ]
-    },
-    {
-        eventType: constants_1.default.PROCESSOR.ENROLLMENT.ACADEMICSELECTIONASSOCIATED,
-        processes: [
-            {
-                processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().AcademicSelectionAssociated(event); }),
-                processName: 'process-academic-selection-associated'
             }
         ]
     },
@@ -129,29 +156,11 @@ exports.eventsToProcess = [
         ]
     },
     {
-        eventType: constants_1.default.PROCESSOR.ENROLLMENT.ACADEMICSELECTIONASSOCIATEDSCHEDULED,
-        processes: [
-            {
-                processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().AcademicSelectionScheduled(event); }),
-                processName: 'process-academic-selection-associated-scheduled'
-            }
-        ]
-    },
-    {
         eventType: constants_1.default.PROCESSOR.DEGREE.DEGREEDINACTIVATED,
         processes: [
             {
                 processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().DegreeDeactivated(event); }),
                 processName: 'process-degree-inactivated'
-            }
-        ]
-    },
-    {
-        eventType: constants_1.default.PROCESSOR.DEGREE.DEGREEREGISTERED,
-        processes: [
-            {
-                processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().DegreeRegistered(event); }),
-                processName: 'process-degree-registered'
             }
         ]
     },
@@ -172,14 +181,5 @@ exports.eventsToProcess = [
     //            processName: 'process-student-signed-up'
     //        }
     //    ]
-    //},
-    {
-        eventType: constants_1.default.PROCESSOR.ACADEMICOFFERS.PROGRAMOFFERED,
-        processes: [
-            {
-                processFunction: (event) => __awaiter(void 0, void 0, void 0, function* () { return yield new rabbitProcessor_datasource_impl_1.default().ProgramOffered(event); }),
-                processName: 'process-program-offered'
-            }
-        ]
-    }
+    //}
 ];

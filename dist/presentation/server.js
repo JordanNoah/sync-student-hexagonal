@@ -20,7 +20,7 @@ const cors_1 = require("hono/cors");
 const rabbitmq_resilience_1 = require("rabbitmq-resilience");
 const node_server_1 = require("@hono/node-server");
 const rabbitmq_1 = require("../infrastructure/rabbitmq");
-const custom_error_1 = require("../domain/errors/custom.error");
+const routes_1 = __importDefault(require("./routes"));
 class Server {
     constructor(options) {
         const { port = appConfig_1.default.PORT } = options;
@@ -31,31 +31,28 @@ class Server {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 (0, init_1.DbSequelize)().then(() => __awaiter(this, void 0, void 0, function* () {
-                    rabbitmq_1.RabbitMQR.init().then(() => {
-                        //TODO: Uncomment this line to run the migration
-                        //await new AcademicElementMigration().migrate()
-                        this.app.use('*', (c, next) => __awaiter(this, void 0, void 0, function* () {
-                            const corsMiddleware = (0, cors_1.cors)();
-                            return yield corsMiddleware(c, next);
-                        }));
-                        this.app.get("/", (c) => {
-                            return c.json({
-                                status: "success",
-                                message: "Welcome to sync student service"
-                            });
+                    //TODO: Uncomment this line to run the migration
+                    //await new AcademicElementMigration().migrate()
+                    this.app.use('*', (c, next) => __awaiter(this, void 0, void 0, function* () {
+                        const corsMiddleware = (0, cors_1.cors)();
+                        return yield corsMiddleware(c, next);
+                    }));
+                    this.app.get("/", (c) => {
+                        return c.json({
+                            status: "success",
+                            message: "Welcome to sync student service"
                         });
-                        this.app.route('/', new rabbitmq_resilience_1.RabbitMQResilienceRoutes().routes);
-                        const server = (0, node_server_1.serve)({
-                            fetch: this.app.fetch,
-                            port: this.port
-                        }, (info) => {
-                            console.log(`Server running on port ${info.port}`);
-                        });
-                        //initialize socket manager
-                        rabbitmq_resilience_1.RabbitMQResilienceSocketManager.initialize(server, '/websocket/');
-                    }).catch(error => {
-                        throw custom_error_1.CustomError.internalServer(error);
                     });
+                    this.app.route('/api', new routes_1.default().routes);
+                    const server = (0, node_server_1.serve)({
+                        fetch: this.app.fetch,
+                        port: this.port
+                    }, (info) => {
+                        console.log(`Server running on port ${info.port}`);
+                    });
+                    //initialize socket manager
+                    rabbitmq_resilience_1.RabbitMQResilienceSocketManager.initialize(server, '/websocket/');
+                    yield rabbitmq_1.RabbitMQR.init();
                 })).catch(error => {
                     console.log(error);
                 });

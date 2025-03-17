@@ -1,4 +1,6 @@
 import { InscriptionSequelize } from "@/infrastructure/database/models";
+import EnrollmentEntity from "./enrollment.entity";
+import DegreeEntity from "./degree.entity";
 
 export default class InscriptionEntity {
     constructor(
@@ -21,7 +23,9 @@ export default class InscriptionEntity {
         public createdAt: Date,
         public updatedAt: Date,
         public deletedAt: Date,
-        public introductoryModule?: string
+        public introductoryModule?: string,
+        public enrollments?: EnrollmentEntity[],
+        public degrees?: DegreeEntity[]
     ){}
 
     static fromRow(row: InscriptionSequelize): InscriptionEntity {
@@ -45,7 +49,9 @@ export default class InscriptionEntity {
             row.createdAt,
             row.updatedAt,
             row.deletedAt,
-            row.introductoryModule
+            row.introductoryModule,
+            row.enrollments,
+            row.degrees
         )
     }
 }

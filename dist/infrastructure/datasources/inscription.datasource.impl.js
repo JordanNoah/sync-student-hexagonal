@@ -73,5 +73,44 @@ class InscriptionDatasourceImpl {
             }
         });
     }
+    getByUuid(uuid) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const inscriptionDb = yield models_1.InscriptionSequelize.findOne({
+                    where: {
+                        uuid: uuid
+                    }
+                });
+                if (!inscriptionDb)
+                    return null;
+                return inscription_entity_1.default.fromRow(inscriptionDb);
+            }
+            catch (error) {
+                custom_error_1.CustomError.throwAnError(error);
+                return Promise.reject(error);
+            }
+        });
+    }
+    updateByEntity(inscriptionEntity) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield models_1.InscriptionSequelize.update(inscriptionEntity, {
+                    where: {
+                        uuid: inscriptionEntity.uuid
+                    }
+                });
+                return inscriptionEntity;
+            }
+            catch (error) {
+                custom_error_1.CustomError.throwAnError(error);
+                return Promise.reject(error);
+            }
+        });
+    }
+    getAcademicRecords() {
+        return __awaiter(this, void 0, void 0, function* () {
+            throw new Error("Method not implemented.");
+        });
+    }
 }
 exports.default = InscriptionDatasourceImpl;

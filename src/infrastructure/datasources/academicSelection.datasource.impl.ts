@@ -14,7 +14,7 @@ export default class AcademicSelectionDatasourceImpl implements AcademicSelectio
                 },
                 defaults: {
                     uuid: academicSelectionEventDto.academicSelection.uuid,
-                    academicElementUuid: academicSelectionEventDto.academicSelection.academicElementUuid,
+                    academicElementUuid: academicSelectionEventDto.academicSelection.academicElementUuid!,
                     enrollmentUuid: academicSelectionEventDto.academicSelection.enrollmentUuid,
                     callUuid: academicSelectionEventDto.academicSelection.call?.uuid,
                     startedAt: academicSelectionEventDto.academicSelection.startedAt,
@@ -24,7 +24,7 @@ export default class AcademicSelectionDatasourceImpl implements AcademicSelectio
 
             if (!created) {
                 academicSelectionDb.uuid = academicSelectionEventDto.academicSelection.uuid
-                academicSelectionDb.academicElementUuid = academicSelectionEventDto.academicSelection.academicElementUuid
+                academicSelectionDb.academicElementUuid = academicSelectionEventDto.academicSelection.academicElementUuid!
                 academicSelectionDb.enrollmentUuid = academicSelectionEventDto.academicSelection.enrollmentUuid
                 academicSelectionDb.callUuid = academicSelectionEventDto.academicSelection.call?.uuid
                 academicSelectionDb.startedAt = academicSelectionEventDto.academicSelection.startedAt
@@ -34,6 +34,51 @@ export default class AcademicSelectionDatasourceImpl implements AcademicSelectio
             }
 
             return AcademicSelectionEntity.fromRow(academicSelectionDb)
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async getByUuid(uuid: string): Promise<AcademicSelectionEntity | null> {
+        try {
+            const academicSelectionDb = await AcademicSelectionSequelize.findOne({
+                where: {
+                    uuid: uuid
+                }
+            })
+            if (!academicSelectionDb) {
+                return null
+            }
+            return AcademicSelectionEntity.fromRow(academicSelectionDb)
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async deleteById(id: number): Promise<void> {
+        try {
+            await AcademicSelectionSequelize.destroy({
+                where: {
+                    id: id
+                }
+            })
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async getByEnrollmentUuid(enrollmentUuid: string): Promise<AcademicSelectionEntity[]> {
+        try {
+            const academicSelections = await AcademicSelectionSequelize.findAll({
+                where: {
+                    enrollmentUuid: enrollmentUuid
+                }
+            })
+            
+            return academicSelections.map(academicSelection => AcademicSelectionEntity.fromRow(academicSelection))
         } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);

@@ -88,4 +88,15 @@ export default class InscriptionElementEventDto {
             new_date
         )]
     }
+
+    static changeStatus(object: { [key: string]: any }): [string?,InscriptionElementEventDto?] {
+        const {uuid, student_uuid} = object
+        const messageErrorComplement = 'missing in inscription structure'
+        if (!uuid) return [`uuid ${messageErrorComplement}`, undefined]
+        if (!student_uuid) return [`student_uuid ${messageErrorComplement}`, undefined]
+        return [undefined, new InscriptionElementEventDto(
+            uuid,
+            student_uuid
+        )]
+    }
 }
