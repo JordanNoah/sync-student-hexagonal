@@ -4,8 +4,10 @@ import { StudentEntity } from "@/domain/entity/educationalSynchro.entity";
 import { CustomError } from "@/domain/errors/custom.error";
 import { ExternalEducationalSyncApiRepository } from "../client/externalEducationalSyncApiRepository";
 import InstitutionEntity from "@/domain/entity/institution.entity";
-import CoursesEduSyncDto from "@/domain/dtos/educationalSynchro/course.eduSync.dto";
+import CoursesEduSyncDto, { CoursesUuidDto } from "@/domain/dtos/educationalSynchro/course.eduSync.dto";
 import GroupCheckEduSyncDto from "@/domain/dtos/educationalSynchro/groupCheck.eduSync.dto";
+import GroupEduSyncDto, { GroupElementEduSyncDto, MissingGroupEduSyncDto } from "@/domain/dtos/educationalSynchro/groups.eduSync.dto";
+import GroupMoodleDto from "@/domain/dtos/moodle/group.moodle.dto";
 
 export default class EducationalSynchroDatasourceImpl implements EducationalSynchroDatasource {
     async getStudent(uuid: string, institution: InstitutionEntity): Promise<StudentEntity | null> {
@@ -36,19 +38,35 @@ export default class EducationalSynchroDatasourceImpl implements EducationalSync
         }
     }
 
-    async createGroups(groups: GroupCheckEduSyncDto[],institution:InstitutionEntity): Promise<GroupCheckEduSyncDto[]> {
+    async createGroups(groups: MissingGroupEduSyncDto[], institution:InstitutionEntity, courseUuids: CoursesUuidDto[]): Promise<GroupElementEduSyncDto[]> {
         try {
-            throw new Error("Method not implemented.");
+            const moodleGroups = groups.map(group => {
+                return GroupMoodleDto.create({
+                    courseid: courseUuids.find(course => course.id === group.courseId)?.externalId,
+                    name: group.groupIdNumber,
+                    idnumber: group.groupIdNumber,
+                    description: group.groupIdNumber,
+                })
+            })
+            
+            const createdGroups = await new ExternalEducationalSyncApiRepository().createGroups(moodleGroups, institution)           
+            
+            return createdGroups.data.map((group:any) => GroupElementEduSyncDto.fromExternal(group))
         } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);
         }
     }
 
-    async getGroups(groupCheckEduSyncDto: GroupCheckEduSyncDto[]): Promise<any> {
+    async getGroups(groupCheckEduSyncDto: GroupCheckEduSyncDto[]): Promise<GroupEduSyncDto> {
         try {
             const response = await new ExternalEducationalSyncApiRepository().getGroupsByIdnumbersAndCourseId(groupCheckEduSyncDto)
-            return response.data
+            const [error, groupEduSyncDto] = GroupEduSyncDto.create(response.data)
+            if (error){
+                throw CustomError.internalServer(error)
+            }
+            
+            return groupEduSyncDto!
         } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);

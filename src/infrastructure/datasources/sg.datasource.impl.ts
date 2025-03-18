@@ -11,7 +11,6 @@ export default class SgDatasourceImpl extends SgDatasource {
             if (error){
                 throw CustomError.internalServer(error)
             }
-            console.log('userSgDto', userSgDto);
             
             return userSgDto!
         } catch (error) {

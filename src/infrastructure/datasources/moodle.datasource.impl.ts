@@ -9,6 +9,8 @@ import StudentToMoodleDto from "@/domain/dtos/moodle/student.moodle.dto";
 import { CoursesUuidDto } from "@/domain/dtos/educationalSynchro/course.eduSync.dto";
 import CourseUuid from "@/domain/dtos/cron/courseUuid.dto";
 import EnrollmentMoodleDto from "@/domain/dtos/moodle/enrollment.moodle.dto";
+import { GroupElementEduSyncDto } from "@/domain/dtos/educationalSynchro/groups.eduSync.dto";
+import AssignGroupMoodleDto from "@/domain/dtos/moodle/assignGroup.moodle.dto";
 
 export default class MoodleDatasourceImpl implements MoodleDatasource {
     async syncStudent(studentUuid: string, institution: InstitutionEntity): Promise<StudentToMoodleDto> {
@@ -45,4 +47,19 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
             return Promise.reject(error);
         }
     }
+
+    async assingGroups(groupElementEduSyncDto: GroupElementEduSyncDto[], institution: InstitutionEntity, student: StudentToMoodleDto): Promise<void> {
+        try {
+            const groupsToAssign = groupElementEduSyncDto.map(group => {                
+                return new AssignGroupMoodleDto(group.externalId, student.id!)
+            })
+
+            await new ExternalMoodleApiRepository(institution).assignUserToGroup(groupsToAssign);
+            
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+    
 }

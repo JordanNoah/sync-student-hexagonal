@@ -27,6 +27,7 @@ export default class CronProcessorDatasourceImpl implements CronProcessorDatasou
         try {
             //capturar todas las inscripciones que no han sido procesadas y que posean degrees
             const academicRecords = await new InscriptionDatasourceImpl().getNotProcessedAfterNow()
+            
             for (const academicRecord of academicRecords) {
                 //enviar a moodle
                 const institution = await new InstitutionDatasourceImpl().getByDegrees(academicRecord.inscription.degrees!)
@@ -34,11 +35,9 @@ export default class CronProcessorDatasourceImpl implements CronProcessorDatasou
                     console.log(`Inscription with uuid ${academicRecord.inscription.uuid} didnt found an institution`)
                     continue
                 }
-
                 const courseUuid: CourseUuid[] = this.getListOfCourses(academicRecord)
                 const courseEduSynchro = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid, institution)
-                console.log(courseUuid);
-                
+
                 if (courseEduSynchro.missingCourse.length > 0) {
                     //todo: correo electronico avisando la falta de cursos
                 }
@@ -61,7 +60,16 @@ export default class CronProcessorDatasourceImpl implements CronProcessorDatasou
                     const basicGroups = this.getListBasicGroups(courseEduSynchro.existingCourses, academicRecord.inscription, institution, courseEduSynchro.existingCourses, courseUuid, programCourse)
                     
                     const eduGroups = await new EducationalSynchroDatasourceImpl().getGroups(basicGroups)
-                    console.log(eduGroups);
+                    
+                    if (eduGroups.missingGroups.length > 0) {
+                        const createGroups = await new EducationalSynchroDatasourceImpl().createGroups(eduGroups.missingGroups, institution, courseEduSynchro.existingCourses)
+                        eduGroups.existGroups.push(...createGroups)
+                    }
+
+                    await new MoodleDatasourceImpl().assingGroups(eduGroups.existGroups, institution, student)
+                    
+//actualizar todo a hecho en db
+                    
                     
                 }
             }
