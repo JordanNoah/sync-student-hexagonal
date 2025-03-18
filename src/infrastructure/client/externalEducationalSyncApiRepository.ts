@@ -4,6 +4,7 @@ import AppConfig from "@/shared/appConfig";
 import { Axios } from "./axios";
 import GroupMoodleDto from "@/domain/dtos/moodle/group.moodle.dto";
 import StudentToMoodleDto from "@/domain/dtos/moodle/student.moodle.dto";
+import GroupCheckEduSyncDto from "@/domain/dtos/educationalSynchro/groupCheck.eduSync.dto";
 
 export class ExternalEducationalSyncApiRepository {
     private readonly axios: Axios;
@@ -56,7 +57,7 @@ export class ExternalEducationalSyncApiRepository {
         return await this.axios.get(webServiceUrl, { params })
     }
 
-    public async getGroupsByIdnumbersAndCourseId(groups: {idNumber:string,courseId:number}[]): Promise<any> {
+    public async getGroupsByIdnumbersAndCourseId(groups: GroupCheckEduSyncDto[]): Promise<any> {
         const webServiceUrl = this.url + '/api/group/search-existence'
         return await this.axios.post(webServiceUrl, groups)
     }

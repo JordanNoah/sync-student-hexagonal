@@ -38,12 +38,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                 return EnrollmentMoodleDto.fromCourseDto(course, student, courseData?.startDate, courseData?.endDate).toJSON()
             })
 
-            const enroll = await new ExternalMoodleApiRepository(institution).enrollUser(coursesToEnrol)
-            for (const element of coursesToEnrol) {
-                console.log("enroll", enroll);
-            }
-            
-            
+            await new ExternalMoodleApiRepository(institution).enrollUser(coursesToEnrol)
             
         } catch (error) {
             CustomError.throwAnError(error)

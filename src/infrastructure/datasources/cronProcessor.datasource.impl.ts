@@ -10,6 +10,9 @@ import CourseUuid from "@/domain/dtos/cron/courseUuid.dto";
 import EducationalSynchroDatasource from "@/domain/datasources/educationalSynchro.datasource";
 import EducationalSynchroDatasourceImpl from "./educationalSynchro.datasource.impl";
 import MoodleDatasourceImpl from "./moodle.datasource.impl";
+import { CoursesUuidDto } from "@/domain/dtos/educationalSynchro/course.eduSync.dto";
+import InscriptionEntity from "@/domain/entity/inscription.entity";
+import GroupCheckEduSyncDto from "@/domain/dtos/educationalSynchro/groupCheck.eduSync.dto";
 
 export default class CronProcessorDatasourceImpl implements CronProcessorDatasource {
     async processAcademicSelections(): Promise<void> {
@@ -34,7 +37,8 @@ export default class CronProcessorDatasourceImpl implements CronProcessorDatasou
 
                 const courseUuid: CourseUuid[] = this.getListOfCourses(academicRecord)
                 const courseEduSynchro = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid, institution)
-
+                console.log(courseUuid);
+                
                 if (courseEduSynchro.missingCourse.length > 0) {
                     //todo: correo electronico avisando la falta de cursos
                 }
@@ -53,6 +57,11 @@ export default class CronProcessorDatasourceImpl implements CronProcessorDatasou
                     }
                     
                     await new MoodleDatasourceImpl().courseEnrolments(courseEduSynchro.existingCourses, courseUuid, student, institution)
+                    
+                    const basicGroups = this.getListBasicGroups(courseEduSynchro.existingCourses, academicRecord.inscription, institution, courseEduSynchro.existingCourses, courseUuid, programCourse)
+                    
+                    const eduGroups = await new EducationalSynchroDatasourceImpl().getGroups(basicGroups)
+                    console.log(eduGroups);
                     
                 }
             }
@@ -113,6 +122,25 @@ export default class CronProcessorDatasourceImpl implements CronProcessorDatasou
         } catch (error) {
             CustomError.throwAnError(error)
             return undefined
+        }
+    }
+    getListBasicGroups(coursesUuidDto:CoursesUuidDto[], inscription:InscriptionEntity, institution:InstitutionEntity, existingCourses: CoursesUuidDto[], listOfCourses: CourseUuid[], programCourse: CoursesUuidDto): GroupCheckEduSyncDto[] {
+        try {
+            const groupsToChech = coursesUuidDto.flatMap(
+                course => {
+                    let arrayOfGroups = [
+                        new GroupCheckEduSyncDto(`lang.${inscription.lang.toLowerCase()}`,course.id),
+                        new GroupCheckEduSyncDto(`org.${institution.abbreviation.toLowerCase()}`,course.id),
+                        new GroupCheckEduSyncDto(`program.${programCourse.shortName!.toLowerCase()}`,course.id),
+                    ]
+
+                    return arrayOfGroups
+                }
+            )
+            return groupsToChech
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return []
         }
     }
 }
