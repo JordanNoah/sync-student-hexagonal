@@ -4,6 +4,7 @@ import AcademicSelectionEntity from "@/domain/entity/academicSelection.entity";
 import { CustomError } from "@/domain/errors/custom.error";
 import { AcademicSelectionSequelize } from "../database/models";
 import { addMinutes } from "@/shared/utils";
+import { Op } from "sequelize";
 
 export default class AcademicSelectionDatasourceImpl implements AcademicSelectionDatasource {
     async createUpdate(academicSelectionEventDto: AcademicSelectionEventDto): Promise<AcademicSelectionEntity> {
@@ -79,6 +80,42 @@ export default class AcademicSelectionDatasourceImpl implements AcademicSelectio
             })
             
             return academicSelections.map(academicSelection => AcademicSelectionEntity.fromRow(academicSelection))
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async setAcademicSelectionNotProcessed(academicSelectionEntity: AcademicSelectionEntity[]): Promise<AcademicSelectionEntity[]> {
+        try {
+            await AcademicSelectionSequelize.update({
+                processedAt: null
+            }, {
+                where:{
+                    id: {
+                        [Op.in]: academicSelectionEntity.map(academicSelection => academicSelection.id)
+                    }
+                }
+            })
+            return academicSelectionEntity
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async setAcademicSelectionProcessed(academicSelectionEntity: AcademicSelectionEntity[]): Promise<AcademicSelectionEntity[]> {
+        try {
+            await AcademicSelectionSequelize.update({
+                processedAt: new Date()
+            }, {
+                where:{
+                    id: {
+                        [Op.in]: academicSelectionEntity.map(academicSelection => academicSelection.id)
+                    }
+                }
+            })
+            return academicSelectionEntity
         } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);

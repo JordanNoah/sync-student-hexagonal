@@ -5,9 +5,8 @@ import { cors } from "hono/cors";
 import { RabbitMQResilienceRoutes, RabbitMQResilienceSocketManager } from "rabbitmq-resilience";
 import { serve } from "@hono/node-server";
 import { RabbitMQR } from "@/infrastructure/rabbitmq";
-import { CustomError } from "@/domain/errors/custom.error";
 import AppRoutes from "./routes";
-import CronProcessorDatasourceImpl from "@/infrastructure/datasources/cronProcessor.datasource.impl";
+import { syncInscriptions } from "@/infrastructure/cron";
 
 interface Options {
     port?: number
@@ -52,7 +51,7 @@ export class Server {
                     //initialize socket manager
                     RabbitMQResilienceSocketManager.initialize(server, '/websocket/')
                     await RabbitMQR.init()
-                    await new CronProcessorDatasourceImpl().processInscriptions()
+                    syncInscriptions.start()
             }).catch(error => {
                 console.log(error)
             })

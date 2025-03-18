@@ -9,4 +9,6 @@ export default abstract class InscriptionDatasource {
     abstract getAcademicRecords(): Promise<AcademicRecordEntity[]>;
     abstract getNotProcessedAfterNow(): Promise<AcademicRecordEntity[]>;
     abstract getAcademicRecordByUuid(uuid: string): Promise<AcademicRecordEntity | null>;
+    abstract setAcademicRecordPrcessed(academicRecordEntity: AcademicRecordEntity): Promise<AcademicRecordEntity>;
+    abstract setAcademicRecordNotProcessed(academicRecordEntity: AcademicRecordEntity): Promise<AcademicRecordEntity>;
 }

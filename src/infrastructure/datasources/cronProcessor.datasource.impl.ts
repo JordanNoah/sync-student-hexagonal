@@ -69,9 +69,8 @@ export default class CronProcessorDatasourceImpl implements CronProcessorDatasou
 
                     await new MoodleDatasourceImpl().assingGroups(eduGroups.existGroups, institution, student)
                     
-//actualizar todo a hecho en db
-                    
-                    
+                    //actualizar todo a hecho en db
+                    await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
                 }
             }
             
