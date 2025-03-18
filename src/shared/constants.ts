@@ -1,4 +1,9 @@
 const appConstants = {
+    ENVIRONMENT: {
+        PRODUCTION: 'production',
+        DEVELOPMENT: 'development',
+        BETA: 'beta'
+    },
     MOODLE_FUNCTIONS_NAME: {
         CREATE_USERS: 'core_user_create_users',
         ENROLL_USER: 'enrol_manual_enrol_users',
