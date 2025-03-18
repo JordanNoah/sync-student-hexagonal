@@ -11,6 +11,7 @@ import CourseUuid from "@/domain/dtos/cron/courseUuid.dto";
 import EnrollmentMoodleDto from "@/domain/dtos/moodle/enrollment.moodle.dto";
 import { GroupElementEduSyncDto } from "@/domain/dtos/educationalSynchro/groups.eduSync.dto";
 import AssignGroupMoodleDto from "@/domain/dtos/moodle/assignGroup.moodle.dto";
+import UnenrollmentMoodleDto from "@/domain/dtos/moodle/unenrollment.moodle.dto";
 
 export default class MoodleDatasourceImpl implements MoodleDatasource {
     async syncStudent(studentUuid: string, institution: InstitutionEntity): Promise<StudentToMoodleDto> {
@@ -62,4 +63,18 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
         }
     }
     
+    async unenrollStudent(student: StudentToMoodleDto, institution: InstitutionEntity, courses: CoursesUuidDto[]): Promise<void> {
+        try {
+            const unenrollments = courses.map(course => {
+                return new UnenrollmentMoodleDto(student.id!, course.externalId, 5)
+            })
+
+            await new ExternalMoodleApiRepository(institution).unenrollUser(unenrollments)
+            
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+            
+        }
+    }
 }

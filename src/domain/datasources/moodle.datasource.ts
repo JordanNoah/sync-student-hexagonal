@@ -8,4 +8,5 @@ export default abstract class MoodleDatasource {
     abstract syncStudent(studentUuid:string, institution:InstitutionEntity): Promise<StudentToMoodleDto>;
     abstract courseEnrolments(coursesUuidDto:CoursesUuidDto[], coursesUuid:CourseUuid[], student:StudentToMoodleDto, institution:InstitutionEntity): Promise<void>;
     abstract assingGroups(groupElementEduSyncDto:GroupElementEduSyncDto[], institution:InstitutionEntity, student: StudentToMoodleDto): Promise<void>;
+    abstract unenrollStudent(student: StudentToMoodleDto, institution: InstitutionEntity, courses:CoursesUuidDto[]): Promise<void>;
 }

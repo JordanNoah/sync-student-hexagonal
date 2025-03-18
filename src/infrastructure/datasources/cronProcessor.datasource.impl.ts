@@ -53,6 +53,7 @@ export default class CronProcessorDatasourceImpl implements CronProcessorDatasou
                     
                     if(!student.isCreated && (academicRecord.inscription.enrollments && academicRecord.inscription.enrollments.length > 0)) {
                         // todo masive unenroll
+                        await new MoodleDatasourceImpl().unenrollStudent(student, institution, courseEduSynchro.existingCourses)
                     }
                     
                     await new MoodleDatasourceImpl().courseEnrolments(courseEduSynchro.existingCourses, courseUuid, student, institution)
