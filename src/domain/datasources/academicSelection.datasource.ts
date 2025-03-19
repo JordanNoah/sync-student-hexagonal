@@ -6,4 +6,6 @@ export default abstract class AcademicSelectionDatasource {
     abstract getByUuid(uuid:string): Promise<AcademicSelectionEntity | null>;
     abstract deleteById(id:number): Promise<void>;
     abstract getByEnrollmentUuid(enrollmentUuid: string): Promise<AcademicSelectionEntity[]>
+    abstract setAcademicSelectionProcessed(academicSelectionEntity: AcademicSelectionEntity[]): Promise<AcademicSelectionEntity[]>;
+    abstract setAcademicSelectionNotProcessed(academicSelectionEntity: AcademicSelectionEntity[]): Promise<AcademicSelectionEntity[]>;
 }

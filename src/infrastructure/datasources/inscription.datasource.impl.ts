@@ -178,4 +178,28 @@ export default class InscriptionDatasourceImpl implements InscriptionDatasource 
             return Promise.reject(error);
         }
     }
+
+    async setAcademicRecordNotProcessed(academicRecordEntity: AcademicRecordEntity): Promise<AcademicRecordEntity> {
+        try {
+            academicRecordEntity.inscription.processed = false
+            await this.updateByEntity(academicRecordEntity.inscription)
+
+            return academicRecordEntity
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async setAcademicRecordPrcessed(academicRecordEntity: AcademicRecordEntity): Promise<AcademicRecordEntity> {
+        try {
+            academicRecordEntity.inscription.processed = true
+            await this.updateByEntity(academicRecordEntity.inscription)
+
+            return academicRecordEntity
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
 }

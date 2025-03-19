@@ -10,7 +10,7 @@ interface AcademicSelectionRow {
     academicElementUuid: string,
     startedAt?: Date,
     finishedAt?: Date,
-    callUuid?: string,
+    callUuid?: string | null,
     processedAt?: Date | null,
     createdAt?: Date,
     updatedAt?: Date,
@@ -24,7 +24,7 @@ export class AcademicSelectionSequelize extends Model<AcademicSelectionRow, Omit
     declare academicElementUuid: string
     declare startedAt?: Date
     declare finishedAt?: Date
-    declare callUuid?: string
+    declare callUuid?: string | null
     declare processedAt?: Date | null
     declare readonly createdAt: Date
     declare readonly updatedAt: Date

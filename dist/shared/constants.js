@@ -1,9 +1,7 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CredentialTypeEnum = exports.EmailTypeEnum = void 0;
 const appConstants = {
-    ENVIRONMENT: {
-        PRODUCTION: 'production',
-        DEVELOPMENT: 'development',
-        BETA: 'beta'
-    },
     MOODLE_FUNCTIONS_NAME: {
         CREATE_USERS: 'core_user_create_users',
         ENROLL_USER: 'enrol_manual_enrol_users',
@@ -22,7 +20,6 @@ const appConstants = {
                 NAME: 'Course Not Found',
                 ABBREVIATION: 'CNF'
             }
-
         },
         NOTIFICATIONS: {
             COURSE_NOT_FOUND: {
@@ -65,15 +62,14 @@ const appConstants = {
         ACTIVATED: 'AC',
         WITHDRAWN: 'WD'
     }
-} as const;
-
-export default appConstants;
-
-export enum EmailTypeEnum {
-    INSTITUTIONAL = 'institutional',
-    PERSONAL = 'personal'
-}
-
-export enum CredentialTypeEnum {
-    LVE = 'LVE'
-}
+};
+exports.default = appConstants;
+var EmailTypeEnum;
+(function (EmailTypeEnum) {
+    EmailTypeEnum["INSTITUTIONAL"] = "institutional";
+    EmailTypeEnum["PERSONAL"] = "personal";
+})(EmailTypeEnum || (exports.EmailTypeEnum = EmailTypeEnum = {}));
+var CredentialTypeEnum;
+(function (CredentialTypeEnum) {
+    CredentialTypeEnum["LVE"] = "LVE";
+})(CredentialTypeEnum || (exports.CredentialTypeEnum = CredentialTypeEnum = {}));

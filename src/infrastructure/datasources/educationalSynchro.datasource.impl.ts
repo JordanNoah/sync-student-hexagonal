@@ -72,5 +72,7 @@ export default class EducationalSynchroDatasourceImpl implements EducationalSync
             return Promise.reject(error);
         }
     }
-
+    async getCourse(uuid: string, institution: InstitutionEntity): Promise<CoursesUuidDto | null> {
+        return null    
+    }
 }

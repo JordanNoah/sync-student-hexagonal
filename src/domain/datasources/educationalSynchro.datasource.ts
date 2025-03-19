@@ -10,4 +10,5 @@ export default abstract class EducationalSynchroDatasource {
     abstract getCourses(coursesUuid: CourseUuid[], institution:InstitutionEntity): Promise<CoursesEduSyncDto>;
     abstract createGroups(groups: MissingGroupEduSyncDto[],institution:InstitutionEntity,courseUuids: CoursesUuidDto[]): Promise<GroupCheckEduSyncDto[]>;
     abstract getGroups(groupCheckEduSyncDto:GroupCheckEduSyncDto[]): Promise<GroupEduSyncDto>
+    abstract getCourse(uuid: string, institution: InstitutionEntity): Promise<CoursesUuidDto | null>
 }
