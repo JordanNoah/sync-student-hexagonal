@@ -7,20 +7,18 @@ export default class UserSgDto {
         public name: string,
         public lastName: string,
         public sureName: string,
-        public sex: string,
+        public sex: string | null,
         public emails: EmailSgDto[],
         public credentials: CredentialDto[]
     ){}
 
     static create(object: { [key: string]: any }): [string?, UserSgDto?] {
         const {uuid, name, last_name, sure_name, sex, emails, credentials} = object;
-        console.log(object);
         
         const messageErrorComplement = 'missing in user structure';
         if (!uuid) return [`uuid ${messageErrorComplement}`, undefined];
         if (!name) return [`name ${messageErrorComplement}`, undefined];
         if (!last_name) return [`last_name ${messageErrorComplement}`, undefined];
-        if (!sex) return [`sex ${messageErrorComplement}`, undefined];
         if (!emails) return [`emails ${messageErrorComplement}`, undefined];
         if (!credentials) return [`credentials ${messageErrorComplement}`, undefined];
 
