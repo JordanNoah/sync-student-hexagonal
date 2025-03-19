@@ -19,24 +19,24 @@ export default class MailerContentDto {
         if(!bodyDescription) return [`bodyDescription ${messageErrorComplement}`, undefined]
         if(!bodyLastDescription) return [`bodyLastDescription ${messageErrorComplement}`, undefined]
         
-        object.bodyHeader = object.bodyHeader.trim().replace(/\s{2,}/g, ' ');
-        object.bodyDescription = object.bodyDescription.trim().replace(/\s{2,}/g, ' ');
-        object.bodySecondaryDescription = object.bodySecondaryDescription ? object.bodySecondaryDescription.trim().replace(/\s{2,}/g, ' ') : null;
-        object.body = object.body ? object.body.trim().replace(/\s{2,}/g, ' ') : null;
-        object.bodySecondary = object.bodySecondary ? object.bodySecondary.trim().replace(/\s{2,}/g, ' ') : null;
-        object.bodyLastDescription = object.bodyLastDescription.trim().replace(/\s{2,}/g, ' ');
+        const trimmedBodyHeader = bodyHeader.trim().replace(/\s{2,}/g, ' ');
+        const trimmedBodyDescription = bodyDescription.trim().replace(/\s{2,}/g, ' ');
+        const trimmedBodySecondaryDescription = bodySecondaryDescription ? bodySecondaryDescription.trim().replace(/\s{2,}/g, ' ') : null;
+        const trimmedBody = body ? body.trim().replace(/\s{2,}/g, ' ') : null;
+        const trimmedBodySecondary = bodySecondary ? bodySecondary.trim().replace(/\s{2,}/g, ' ') : null;
+        const trimmedBodyLastDescription = bodyLastDescription.trim().replace(/\s{2,}/g, ' ');
 
         return [
             undefined, 
             new MailerContentDto(
                 name, 
                 abbreviation, 
-                bodyHeader, 
-                bodyDescription, 
-                bodySecondaryDescription, 
-                body, 
-                bodySecondary, 
-                bodyLastDescription
+                trimmedBodyHeader, 
+                trimmedBodyDescription, 
+                trimmedBodySecondaryDescription, 
+                trimmedBody, 
+                trimmedBodySecondary, 
+                trimmedBodyLastDescription
             )
         ]
     }

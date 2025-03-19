@@ -10,6 +10,8 @@ export default class MailerTemplateContentDto {
         const {id, mailerTemplateId, mailerContentId, mailerNotificationId} = object
         const messageErrorComplement = 'missing in mailerTemplateContent structure'
         if (!mailerTemplateId) return [`mailerTemplateId ${messageErrorComplement}`, undefined]
+        if (!mailerContentId) return [`mailerContentId ${messageErrorComplement}`, undefined]
+        if (!mailerNotificationId) return [`mailerNotificationId ${messageErrorComplement}`, undefined]
         return [
             undefined, 
             new MailerTemplateContentDto(
@@ -20,4 +22,4 @@ export default class MailerTemplateContentDto {
             )
         ]
     }
-}
+} 

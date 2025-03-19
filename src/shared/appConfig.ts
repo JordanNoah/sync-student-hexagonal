@@ -17,6 +17,7 @@ export default {
     ACADEMIC_RECORD_API_URL: process.env.ACADEMIC_RECORD_API_URL ?? '',
     EDUCATIONAL_SYNC_URL: process.env.EDUCATIONAL_SYNC_URL ?? '',
     TRANSACTION_DELAY_MINUTES: process.env.TRANSACTION_DELAY_MINUTES ? Number(process.env.TRANSACTION_DELAY_MINUTES) : 5,
+    MAILER_ENVIRONMENT: process.env.MAILER_ENVIRONMENT ?? 'development',
     RABBIT_USERNAME: process.env.RABBIT_USERNAME ?? '',
     RABBIT_PASSWORD: process.env.RABBIT_PASSWORD ?? '',
     RABBIT_PROTOCOL: process.env.RABBIT_PROTOCOL ?? '',

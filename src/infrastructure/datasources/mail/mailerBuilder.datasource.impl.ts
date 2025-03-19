@@ -12,6 +12,7 @@ import MailerHistoryDto from "@/domain/dtos/mail/mailerHistory.dto";
 import { Mailer } from "@/infrastructure/mail/mailer";
 import { MailerNotificationEntity } from "@/domain/entity/mail/mailerNotification.entity";
 import InscriptionElementEventDto from "@/domain/dtos/inscription/inscriptionElement.event.dto";
+import appConfig from "@/shared/appConfig";
 
 
 export class MailerBuilderNotificationDatasourceImpl implements MailerBuilderNotificationDatasource {
@@ -33,7 +34,7 @@ export class MailerBuilderNotificationDatasourceImpl implements MailerBuilderNot
     async buildNotification(): Promise<SendMailerDto> {
         try {
             const placeholders = this.mailerRequestDto?.placeholders ?? {};
-            const environment: Environment = process.env.NODE_ENV as Environment;
+            const environment: Environment = appConfig.MAILER_ENVIRONMENT as Environment;
             
             const environmentPrefix = environment !== 'production'
                 ? `${environment.charAt(0).toUpperCase() + environment.slice(1)} - `

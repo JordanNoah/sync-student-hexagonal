@@ -64,15 +64,15 @@ MailerTemplateContentSequelize.init({
     indexes: [
         {
             name: 'mailer_template_content_mailer_template_id_index',
-            fields: ['mailerTemplateId']
+            fields: ['mailer_template_id']
         },
         {
             name: 'mailer_template_content_mailer_content_id_index',
-            fields: ['mailerContentId']
+            fields: ['mailer_content_id']
         },
         {
             name: 'mailer_template_content_mailer_notification_id_index',
-            fields: ['mailerNotificationId']
+            fields: ['mailer_notification_id']
         }
     ]
 });

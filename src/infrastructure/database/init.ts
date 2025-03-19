@@ -5,11 +5,16 @@ import {
     DegreeSequelize,
     EnrollmentSequelize,
     InscriptionSequelize,
-    InstitutionSequelize
+    InstitutionSequelize,
+    MailerContentSequelize,
+    MailerHistorySequelize,
+    MailerNotificationSequelize,
+    MailerTemplateContentSequelize,
+    MailerTemplateSequelize
 } from "./models"
 
 import {InboxEventSequelize,OutboxEventSequelize,EventProcessLogSequelize} from "rabbitmq-resilience/dist/infrastructure/database/models/eventManager/index"
-import { InstitutionSeederExec } from "./seeders/exec/institution.seeder.exec"
+import { InstitutionSeederExec, MailerContentSeederExec, MailerNotificationSeederExec, MailerTemplateContentSeederExec, MailerTemplateSeederExec } from "./seeders/exec"
 
 export const DbSequelize = async () => {
     try {
@@ -20,8 +25,17 @@ export const DbSequelize = async () => {
         await EnrollmentSequelize.sync()
         await InscriptionSequelize.sync()
         await InstitutionSequelize.sync()
+        await MailerTemplateSequelize.sync();
+        await MailerContentSequelize.sync();
+        await MailerNotificationSequelize.sync();
+        await MailerTemplateContentSequelize.sync();
+        await MailerHistorySequelize.sync();
 
         await new InstitutionSeederExec().up()
+        await new MailerTemplateSeederExec().up()
+        await new MailerContentSeederExec().up()
+        await new MailerNotificationSeederExec().up()
+        await new MailerTemplateContentSeederExec().up()
     }catch (error: any) {
         throw CustomError.internalServer(error)
     }
