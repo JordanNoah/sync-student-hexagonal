@@ -8,6 +8,8 @@ import { RabbitMQR } from "@/infrastructure/rabbitmq";
 import { CustomError } from "@/domain/errors/custom.error";
 import AppRoutes from "./routes";
 import CronProcessorDatasourceImpl from "@/infrastructure/datasources/cronProcessor.datasource.impl";
+import AcademicRecordEntity from "@/domain/entity/academicRecord.entity";
+import { MailerManagmentDatasourceImpl } from "@/infrastructure/datasources/mail/mailerManagement.datasource.impl";
 
 interface Options {
     port?: number
@@ -27,37 +29,49 @@ export class Server {
         try {
             DbSequelize().then(async () => {
                 
-                    //TODO: Uncomment this line to run the migration
-                    //await new AcademicElementMigration().migrate()
-
-                    this.app.use('*', async (c, next) => {
-                        const corsMiddleware = cors()
-                        return await corsMiddleware(c, next)
-                    })
-
-                    this.app.get("/", (c) => {
-                        return c.json({
-                            status: "success",
-                            message: "Welcome to sync student service"
-                        });
+                this.app.use('*', async (c, next) => {
+                    const corsMiddleware = cors();
+                    return await corsMiddleware(c, next);
+                });
+    
+                this.app.get("/", (c) => {
+                    return c.json({
+                        status: "success",
+                        message: "Welcome to sync student service"
                     });
-
-                    this.app.route('/api', new AppRoutes().routes)
-                    const  server = serve({
-                        fetch: this.app.fetch,
-                        port: this.port
-                    }, (info) => {
-                        console.log(`Server running on port ${info.port}`)
-                    })
-                    //initialize socket manager
-                    RabbitMQResilienceSocketManager.initialize(server, '/websocket/')
-                    await RabbitMQR.init()
-                    await new CronProcessorDatasourceImpl().processInscriptions()
+                });
+    
+                this.app.route('/api', new AppRoutes().routes);
+    
+                const server = serve({
+                    fetch: this.app.fetch,
+                    port: this.port
+                }, (info) => {
+                    console.log(`Server running on port ${info.port}`);
+                });
+    
+                // Initialize socket manager
+                RabbitMQResilienceSocketManager.initialize(server, '/websocket/');
+                await RabbitMQR.init();
+                await new CronProcessorDatasourceImpl().processInscriptions();
+    
+                // ======= Enviar correo desde el datasource ======= //     
+                try {
+                    const mailerDatasource = new MailerManagmentDatasourceImpl();
+                
+                    console.log("Llamando a notificationCNF()..."); // Agregar log antes de llamar
+                    await mailerDatasource.notificationCNF();
+                    console.log("Correo enviado correctamente desde el datasource.");
+                } catch (emailError) {
+                    console.error("Error enviando correo desde el datasource:", emailError);
+                }
+                
             }).catch(error => {
-                console.log(error)
-            })
+                console.log(error);
+            });
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
     }
+    
 }

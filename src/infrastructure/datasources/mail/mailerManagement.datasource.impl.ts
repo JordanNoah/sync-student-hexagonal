@@ -13,17 +13,25 @@ export class MailerManagmentDatasourceImpl implements MailerManagmentDatasource 
 
     }
 
-    async notificationCNF(academicRecord: AcademicRecordEntity): Promise<void> {
+    async notificationCNF(): Promise<void> {
         try {
-            const studentUuid = academicRecord.inscription?.studentUuid
+            const studentUuid = 'asdasdasdadasd'
             // const studentUsername = academicRecord.
             // if (!studentUsername) { throw CustomError.notFound('Student not found'); }
 
             const placeholders = {
+                courseAbbreviation: 'ABBBBB',
+                courseIdNumber: '123456',
+                institutionAbbreviation: 'INSTITUTION',
+                studentUsername: 'USERNAME',
+                studentIdNumber: '123456',
+                program: 'PROGRAM',
+                programVersion: 'VERSION',
+                programIdNumber: '123456'
             };
 
-            const [error, emailRequestDto] = MailerRequestDto.create({
-                studentUuid: studentUuid,
+            console.log('Creating email request with the following data:', {
+                studentUuid,
                 notificationAbbreviation: appConstants.MAILER.NOTIFICATIONS.COURSE_NOT_FOUND.ABBREVIATION,
                 templateAbbreviation: appConstants.MAILER.TEMPLATE.BASE.ABBREVIATION,
                 contentAbbreviation: appConstants.MAILER.CONTENT.COURSE_NOT_FOUND.ABBREVIATION,
@@ -33,9 +41,23 @@ export class MailerManagmentDatasourceImpl implements MailerManagmentDatasource 
                 placeholders
             });
 
+            const [error, emailRequestDto] = MailerRequestDto.create({
+                studentInscription: studentUuid,
+                notificationAbbreviation: appConstants.MAILER.NOTIFICATIONS.COURSE_NOT_FOUND.ABBREVIATION,
+                templateAbbreviation: appConstants.MAILER.TEMPLATE.BASE.ABBREVIATION,
+                contentAbbreviation: appConstants.MAILER.CONTENT.COURSE_NOT_FOUND.ABBREVIATION,
+                to: [],
+                cc: [],
+                bcc: [],
+                placeholders
+            });
+
+            console.log('EmailRequestDto:', emailRequestDto);
+            
             if (error) throw CustomError.internalServer('Error creating EmailRequestDto');
             if (emailRequestDto) await this.buildEmailNotificationDatasourceImpl.sendNotification(emailRequestDto);
         } catch (error: any) {
+            console.log(error)
             if (error instanceof CustomError) {
                 throw error;
             }

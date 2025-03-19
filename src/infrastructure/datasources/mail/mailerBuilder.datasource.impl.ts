@@ -16,7 +16,7 @@ import appConfig from "@/shared/appConfig";
 
 
 export class MailerBuilderNotificationDatasourceImpl implements MailerBuilderNotificationDatasource {
-    private studentInscriptionDto: InscriptionElementEventDto | null = null;
+    private studentInscriptionDto: string | null = null;
     private mailerRequestDto: MailerRequestDto | null = null;
     private mailerNotificationEntity: MailerNotificationEntity | null = null;
     private notificationAbbreviation: string = '';
@@ -78,14 +78,14 @@ export class MailerBuilderNotificationDatasourceImpl implements MailerBuilderNot
             const emailNotification = await this.buildNotification();
 
             // Check if emailNotification exists
-            const exists = await new MailerHistoryDatasourceImpl().checkIfNotificationExists(this.studentInscriptionDto?.studentUuid!, this.mailerNotificationEntity?.id!);
+            const exists = await new MailerHistoryDatasourceImpl().checkIfNotificationExists('asdasd', this.mailerNotificationEntity?.id!);
 
             if (exists) {
                 console.log('Notification already sent');
             } else {
                 console.log('Registering notification');
                 const [error, mailerNotificationHistoryDto] = MailerHistoryDto.create({
-                    delegateId: this.studentInscriptionDto?.studentUuid,
+                    studentUuid: 'asdasda',
                     mailerNotificationId: this.mailerNotificationEntity?.id,
                     subject: emailNotification.subject,
                     to: emailNotification.to,
@@ -115,6 +115,7 @@ export class MailerBuilderNotificationDatasourceImpl implements MailerBuilderNot
                 }
             }
         }catch (error: any) {
+            console.log(error)
             if (error instanceof CustomError) {
                 throw error;
             }

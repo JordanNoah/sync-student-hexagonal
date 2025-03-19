@@ -2,7 +2,7 @@ import InscriptionElementEventDto from "../inscription/inscriptionElement.event.
 
 export default class MailerRequestDto {
     constructor(
-        public studentInscription: InscriptionElementEventDto,
+        public studentInscription: string,
         public notificationAbbreviation: string,
         public templateAbbreviation: string,
         public contentAbbreviation: string,
@@ -20,7 +20,6 @@ export default class MailerRequestDto {
         if (!notificationAbbreviation) return [`notificationAbbreviation ${messageErrorComplement}`, undefined]
         if (!templateAbbreviation) return [`templateAbbreviation ${messageErrorComplement}`, undefined]
         if (!contentAbbreviation) return [`contentAbbreviation ${messageErrorComplement}`, undefined]
-        if (!to) return [`to ${messageErrorComplement}`, undefined]
 
         return [
             undefined, 
