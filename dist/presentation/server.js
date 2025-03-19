@@ -13,14 +13,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Server = void 0;
-const init_1 = require("../infrastructure/database/init");
-const appConfig_1 = __importDefault(require("../shared/appConfig"));
+const init_1 = require("@/infrastructure/database/init");
+const appConfig_1 = __importDefault(require("@/shared/appConfig"));
 const hono_1 = require("hono");
 const cors_1 = require("hono/cors");
 const rabbitmq_resilience_1 = require("rabbitmq-resilience");
 const node_server_1 = require("@hono/node-server");
-const rabbitmq_1 = require("../infrastructure/rabbitmq");
+const rabbitmq_1 = require("@/infrastructure/rabbitmq");
 const routes_1 = __importDefault(require("./routes"));
+const cron_1 = require("@/infrastructure/cron");
 class Server {
     constructor(options) {
         const { port = appConfig_1.default.PORT } = options;
@@ -53,6 +54,7 @@ class Server {
                     //initialize socket manager
                     rabbitmq_resilience_1.RabbitMQResilienceSocketManager.initialize(server, '/websocket/');
                     yield rabbitmq_1.RabbitMQR.init();
+                    cron_1.syncInscriptions.start();
                 })).catch(error => {
                     console.log(error);
                 });

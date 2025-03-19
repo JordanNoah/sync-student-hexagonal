@@ -12,10 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const custom_error_1 = require("../../domain/errors/custom.error");
+const custom_error_1 = require("@/domain/errors/custom.error");
 const models_1 = require("../database/models");
-const utils_1 = require("../../shared/utils");
-const inscription_entity_1 = __importDefault(require("../../domain/entity/inscription.entity"));
+const utils_1 = require("@/shared/utils");
+const inscription_entity_1 = __importDefault(require("@/domain/entity/inscription.entity"));
+const academicRecord_entity_1 = __importDefault(require("@/domain/entity/academicRecord.entity"));
+const degree_datasource_impl_1 = __importDefault(require("./degree.datasource.impl"));
+const academicSelection_datasource_impl_1 = __importDefault(require("./academicSelection.datasource.impl"));
+const enrollment_datasource_impl_1 = __importDefault(require("./enrollment.datasource.impl"));
+const sequelize_1 = require("sequelize");
 class InscriptionDatasourceImpl {
     createUpdate(inscriptionEventDto) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -109,7 +114,115 @@ class InscriptionDatasourceImpl {
     }
     getAcademicRecords() {
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Method not implemented.");
+            try {
+                const academicRecords = [];
+                const inscriptions = yield models_1.InscriptionSequelize.findAll();
+                for (const inscription of inscriptions) {
+                    const degrees = yield new degree_datasource_impl_1.default().getByInscriptionUuid(inscription.uuid);
+                    if (degrees.length == 0) {
+                        continue;
+                    }
+                    inscription.degrees = degrees;
+                    inscription.enrollments = yield new enrollment_datasource_impl_1.default().getByInscriptionUuid(inscription.uuid);
+                    if (inscription.enrollments.length > 0) {
+                        for (const enrollment of inscription.enrollments) {
+                            enrollment.academicSelections = yield new academicSelection_datasource_impl_1.default().getByEnrollmentUuid(enrollment.uuid);
+                        }
+                    }
+                    academicRecords.push(new academicRecord_entity_1.default(inscription_entity_1.default.fromRow(inscription)));
+                }
+                return academicRecords;
+            }
+            catch (error) {
+                custom_error_1.CustomError.throwAnError(error);
+                return Promise.reject(error);
+            }
+        });
+    }
+    getAcademicRecordByUuid(uuid) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const inscription = yield models_1.InscriptionSequelize.findOne({
+                    where: {
+                        uuid
+                    }
+                });
+                if (!inscription)
+                    return null;
+                const degrees = yield new degree_datasource_impl_1.default().getByInscriptionUuid(inscription.uuid);
+                inscription.degrees = degrees;
+                inscription.enrollments = yield new enrollment_datasource_impl_1.default().getByInscriptionUuid(inscription.uuid);
+                if (inscription.enrollments.length > 0) {
+                    for (const enrollment of inscription.enrollments) {
+                        enrollment.academicSelections = yield new academicSelection_datasource_impl_1.default().getByEnrollmentUuid(enrollment.uuid);
+                    }
+                }
+                return new academicRecord_entity_1.default(inscription_entity_1.default.fromRow(inscription));
+            }
+            catch (error) {
+                custom_error_1.CustomError.throwAnError(error);
+                return Promise.reject(error);
+            }
+        });
+    }
+    getNotProcessedAfterNow() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const academicRecords = [];
+                const inscriptions = yield models_1.InscriptionSequelize.findAll({
+                    where: {
+                        processWhen: {
+                            [sequelize_1.Op.lt]: new Date(),
+                        },
+                        processed: false
+                    }
+                });
+                for (const inscription of inscriptions) {
+                    const degrees = yield new degree_datasource_impl_1.default().getByInscriptionUuid(inscription.uuid);
+                    if (degrees.length == 0) {
+                        continue;
+                    }
+                    inscription.degrees = degrees;
+                    inscription.enrollments = yield new enrollment_datasource_impl_1.default().getByInscriptionUuid(inscription.uuid);
+                    if (inscription.enrollments.length > 0) {
+                        for (const enrollment of inscription.enrollments) {
+                            enrollment.academicSelections = yield new academicSelection_datasource_impl_1.default().getByEnrollmentUuid(enrollment.uuid);
+                        }
+                    }
+                    academicRecords.push(new academicRecord_entity_1.default(inscription_entity_1.default.fromRow(inscription)));
+                }
+                return academicRecords;
+            }
+            catch (error) {
+                custom_error_1.CustomError.throwAnError(error);
+                return Promise.reject(error);
+            }
+        });
+    }
+    setAcademicRecordNotProcessed(academicRecordEntity) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                academicRecordEntity.inscription.processed = false;
+                yield this.updateByEntity(academicRecordEntity.inscription);
+                return academicRecordEntity;
+            }
+            catch (error) {
+                custom_error_1.CustomError.throwAnError(error);
+                return Promise.reject(error);
+            }
+        });
+    }
+    setAcademicRecordPrcessed(academicRecordEntity) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                academicRecordEntity.inscription.processed = true;
+                yield this.updateByEntity(academicRecordEntity.inscription);
+                return academicRecordEntity;
+            }
+            catch (error) {
+                custom_error_1.CustomError.throwAnError(error);
+                return Promise.reject(error);
+            }
         });
     }
 }

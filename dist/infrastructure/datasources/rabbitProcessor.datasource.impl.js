@@ -12,19 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const inscription_event_dto_1 = __importDefault(require("../../domain/dtos/inscription/inscription.event.dto"));
-const custom_error_1 = require("../../domain/errors/custom.error");
+const inscription_event_dto_1 = __importDefault(require("@/domain/dtos/inscription/inscription.event.dto"));
+const custom_error_1 = require("@/domain/errors/custom.error");
 const inscription_datasource_impl_1 = __importDefault(require("./inscription.datasource.impl"));
 const enrollment_datasource_impl_1 = __importDefault(require("./enrollment.datasource.impl"));
-const enrollment_event_dto_1 = __importDefault(require("../../domain/dtos/enrollment/enrollment.event.dto"));
-const academicSelection_event_dto_1 = __importDefault(require("../../domain/dtos/academicSelection/academicSelection.event.dto"));
+const enrollment_event_dto_1 = __importDefault(require("@/domain/dtos/enrollment/enrollment.event.dto"));
+const academicSelection_event_dto_1 = __importDefault(require("@/domain/dtos/academicSelection/academicSelection.event.dto"));
 const academicSelection_datasource_impl_1 = __importDefault(require("./academicSelection.datasource.impl"));
-const degree_event_dto_1 = __importDefault(require("../../domain/dtos/degree/degree.event.dto"));
+const degree_event_dto_1 = __importDefault(require("@/domain/dtos/degree/degree.event.dto"));
 const degree_datasource_impl_1 = __importDefault(require("./degree.datasource.impl"));
-const programOffered_event_dto_1 = __importDefault(require("../../domain/dtos/programOffered/programOffered.event.dto"));
+const programOffered_event_dto_1 = __importDefault(require("@/domain/dtos/programOffered/programOffered.event.dto"));
 const programOffered_datasource_impl_1 = __importDefault(require("./programOffered.datasource.impl"));
-const constants_1 = __importDefault(require("../../shared/constants"));
-const enrollmentProgramChange_event_dto_1 = __importDefault(require("../../domain/dtos/enrollment/enrollmentProgramChange.event.dto"));
+const constants_1 = __importDefault(require("@/shared/constants"));
+const enrollmentProgramChange_event_dto_1 = __importDefault(require("@/domain/dtos/enrollment/enrollmentProgramChange.event.dto"));
 class RabbitProcessorDatasourceImpl {
     InscriptioRegisteredProcessor(message) {
         return __awaiter(this, void 0, void 0, function* () {
