@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class EnrollmentEntity {
-    constructor(id, uuid, studentUuid, inscriptionUuid, programUuid, programVersion, programVersionUuid, academicTermUuid, createdAt, updatedAt, deletedAt) {
+    constructor(id, uuid, studentUuid, inscriptionUuid, programUuid, programVersion, programVersionUuid, academicTermUuid, createdAt, updatedAt, deletedAt, academicSelections) {
         this.id = id;
         this.uuid = uuid;
         this.studentUuid = studentUuid;
@@ -13,9 +13,10 @@ class EnrollmentEntity {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
+        this.academicSelections = academicSelections;
     }
     static fromRow(row) {
-        return new EnrollmentEntity(row.id, row.uuid, row.studentUuid, row.inscriptionUuid, row.programUuid, row.programVersion, row.programVersionUuid, row.academicTermUuid, row.createdAt, row.updatedAt, row.deletedAt);
+        return new EnrollmentEntity(row.id, row.uuid, row.studentUuid, row.inscriptionUuid, row.programUuid, row.programVersion, row.programVersionUuid, row.academicTermUuid, row.createdAt, row.updatedAt, row.deletedAt, row.academicSelections);
     }
 }
 exports.default = EnrollmentEntity;
