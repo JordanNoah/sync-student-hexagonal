@@ -48,7 +48,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             if (error) {
                 throw CustomError.internalServer(error)
             }
-            const academicSelectionEntity = await new AcademicSelectionDatasourceImpl().getByUuid(academicSelectionDto!.uuid);
+            const academicSelectionEntity = await new AcademicSelectionDatasourceImpl().getByUuid(academicSelectionDto!.academicSelection.uuid);
 
             if (!academicSelectionEntity) {
                 throw CustomError.notFound(`AcademicSelection with uuid ${academicSelectionDto!.uuid} not found`)
@@ -56,7 +56,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
 
             await new AcademicSelectionDatasourceImpl().deleteById(academicSelectionEntity.id);
 
-            
+
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
