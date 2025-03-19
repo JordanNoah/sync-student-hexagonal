@@ -16,6 +16,8 @@ export default class AcademicSelectionElementEventDto {
         if (!uuid) return [`uuid ${messageErrorComplement}`, undefined]
         if (!enrollment_uuid) return [`enrollment_uuid ${messageErrorComplement}`, undefined]
         if (!academic_element_uuid) return [`academic_element_uuid ${messageErrorComplement}`, undefined]
+        console.log("call: ", object);
+        
         if (call) {
             const [error, callElement] = AcademicSelectionCallEventDto.create(call)
             if (error) return [error, undefined]

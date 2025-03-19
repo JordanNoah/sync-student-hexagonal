@@ -12,6 +12,11 @@ import EnrollmentMoodleDto from "@/domain/dtos/moodle/enrollment.moodle.dto";
 import { GroupElementEduSyncDto } from "@/domain/dtos/educationalSynchro/groups.eduSync.dto";
 import AssignGroupMoodleDto from "@/domain/dtos/moodle/assignGroup.moodle.dto";
 import UnenrollmentMoodleDto from "@/domain/dtos/moodle/unenrollment.moodle.dto";
+import AcademicSelectionEntity from "@/domain/entity/academicSelection.entity";
+import InscriptionDatasourceImpl from "./inscription.datasource.impl";
+import EnrollmentDatasourceImpl from "./enrollment.datasource.impl";
+import InstitutionDatasourceImpl from "./institution.datasource.impl";
+import DegreeDatasourceImpl from "./degree.datasource.impl";
 
 export default class MoodleDatasourceImpl implements MoodleDatasource {
     async syncStudent(studentUuid: string, institution: InstitutionEntity): Promise<StudentToMoodleDto> {
@@ -75,6 +80,35 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
             CustomError.throwAnError(error)
             return Promise.reject(error);
             
+        }
+    }
+
+    async discardAcademicSelection(AcademicSelectionEntity: AcademicSelectionEntity): Promise<void> {
+        try {
+            const enrollment = await new EnrollmentDatasourceImpl().getByUuid(AcademicSelectionEntity.enrollmentUuid)
+            if(!enrollment){
+                throw CustomError.internalServer("Enrollment not found")
+            }
+            const inscription = await new InscriptionDatasourceImpl().getByUuid(enrollment.inscriptionUuid)
+            if(!inscription){
+                throw CustomError.internalServer("Inscription not found")
+            }
+
+            const degrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscription.uuid)
+            if(degrees.length === 0){
+                throw CustomError.internalServer("Degree not found")
+            }
+
+            const institution = await new InstitutionDatasourceImpl().getByDegrees(degrees)
+            if(!institution){
+                throw CustomError.internalServer("Institution not found")
+            }
+
+            const student = await this.syncStudent(inscription.studentUuid, institution)
+            //const courses = await new EducationalSynchroDatasourceImpl().getCourses(AcademicSelectionEntity.coursesUuid, institution)
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
         }
     }
 }

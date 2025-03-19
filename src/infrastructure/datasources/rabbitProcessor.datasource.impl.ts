@@ -55,6 +55,8 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             }
 
             await new AcademicSelectionDatasourceImpl().deleteById(academicSelectionEntity.id);
+
+            
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
