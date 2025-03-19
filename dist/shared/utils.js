@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.addMinutes = addMinutes;
 exports.getOnlyYearAndMonth = getOnlyYearAndMonth;
 exports.dateToTimeStamp = dateToTimeStamp;
-const custom_error_1 = require("@/domain/errors/custom.error");
+const custom_error_1 = require("../domain/errors/custom.error");
 const appConfig_1 = __importDefault(require("./appConfig"));
 function addMinutes(date) {
     let dateFinal = null;

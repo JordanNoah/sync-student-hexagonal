@@ -12,7 +12,7 @@ export default class AcademicSelectionEntity {
         public readonly deletedAt: Date,
         public startedAt?: Date,
         public finishedAt?: Date,
-        public callUuid?: string,
+        public callUuid?: string | null,
         public processedAt?: Date | null,
         public academicPeriod?: AcademicPeriodEntity
     ){}

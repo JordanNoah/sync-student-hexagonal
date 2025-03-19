@@ -46,12 +46,12 @@ const appConstants = {
             ENROLLMENTDISCARDED: 'academic-administration.enrollment-management.enrollment_discarded',
             ACADEMICSELECTIONASSOCIATED: 'academic-administration.enrollment-management.academic_selection_associated',
             ACADEMICSELECTIONDISCARDED: 'academic-administration.enrollment-management.academic_selection_discarded',
-            ENROLLMENTPROGRAMCHANGED: 'academic-administration.academic-administration.enrollment-management.program_changed',
+            ENROLLMENTPROGRAMCHANGED: 'academic-administration.enrollment-management.program_changed',
             ACADEMICSELECTIONASSOCIATEDSCHEDULED: 'academic-administration.enrollment-management.academic_selection_scheduled',
         },
         DEGREE: {
-            DEGREEWITHDRAWN: 'academic-administration.degree-management.degree_withdrawn',
-            DEGREEDINACTIVATED: 'academic-administration.degree-management.degree_deactivated',
+            DEGREEWITHDRAWN: 'academic-administration.degree-control.degree_withdrawn',
+            DEGREEDINACTIVATED: 'academic-administration.degree-control.degree_inactivated',
             DEGREEREGISTERED: 'academic-administration.degree-control.degree_registered'
         },
         ACADEMICOFFERS: {

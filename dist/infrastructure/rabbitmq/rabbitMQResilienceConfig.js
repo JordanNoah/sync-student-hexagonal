@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.rabbitMQResilienceConfig = void 0;
-const config_1 = require("@/infrastructure/rabbitmq/config");
-const eventsToProcess_1 = require("@/infrastructure/rabbitmq/eventsToProcess");
-const sequelize_1 = require("@/infrastructure/database/sequelize");
-const appConfig_1 = __importDefault(require("@/shared/appConfig"));
+const config_1 = require("../../infrastructure/rabbitmq/config");
+const eventsToProcess_1 = require("../../infrastructure/rabbitmq/eventsToProcess");
+const sequelize_1 = require("../../infrastructure/database/sequelize");
+const appConfig_1 = __importDefault(require("../../shared/appConfig"));
 exports.rabbitMQResilienceConfig = {
     rabbitMQConfigConnect: config_1.config,
     queue: appConfig_1.default.RABBIT_QUEUE,

@@ -12,11 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const custom_error_1 = require("@/domain/errors/custom.error");
+const custom_error_1 = require("../../domain/errors/custom.error");
 const models_1 = require("../database/models");
-const utils_1 = require("@/shared/utils");
-const inscription_entity_1 = __importDefault(require("@/domain/entity/inscription.entity"));
-const academicRecord_entity_1 = __importDefault(require("@/domain/entity/academicRecord.entity"));
+const utils_1 = require("../../shared/utils");
+const inscription_entity_1 = __importDefault(require("../../domain/entity/inscription.entity"));
+const academicRecord_entity_1 = __importDefault(require("../../domain/entity/academicRecord.entity"));
 const degree_datasource_impl_1 = __importDefault(require("./degree.datasource.impl"));
 const academicSelection_datasource_impl_1 = __importDefault(require("./academicSelection.datasource.impl"));
 const enrollment_datasource_impl_1 = __importDefault(require("./enrollment.datasource.impl"));

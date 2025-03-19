@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DbSequelize = void 0;
-const custom_error_1 = require("@/domain/errors/custom.error");
+const custom_error_1 = require("../../domain/errors/custom.error");
 const models_1 = require("./models");
 const institution_seeder_exec_1 = require("./seeders/exec/institution.seeder.exec");
 const DbSequelize = () => __awaiter(void 0, void 0, void 0, function* () {

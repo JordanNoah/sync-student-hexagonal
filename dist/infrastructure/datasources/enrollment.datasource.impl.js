@@ -12,8 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const enrollment_entity_1 = __importDefault(require("@/domain/entity/enrollment.entity"));
-const custom_error_1 = require("@/domain/errors/custom.error");
+const enrollment_entity_1 = __importDefault(require("../../domain/entity/enrollment.entity"));
+const custom_error_1 = require("../../domain/errors/custom.error");
 const models_1 = require("../database/models");
 class EnrollmentDatasourceImpl {
     createUpdate(enrollmentEventDto) {

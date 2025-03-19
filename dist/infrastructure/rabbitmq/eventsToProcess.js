@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.eventsToProcess = void 0;
-const constants_1 = __importDefault(require("@/shared/constants"));
-const rabbitProcessor_datasource_impl_1 = __importDefault(require("@/infrastructure/datasources/rabbitProcessor.datasource.impl"));
+const constants_1 = __importDefault(require("../../shared/constants"));
+const rabbitProcessor_datasource_impl_1 = __importDefault(require("../../infrastructure/datasources/rabbitProcessor.datasource.impl"));
 //**
 // in process use import {EventException} from 'rabbitmq-resilience';
 // example  throw EventException.actionNotAllowed('Simulated random failure')
