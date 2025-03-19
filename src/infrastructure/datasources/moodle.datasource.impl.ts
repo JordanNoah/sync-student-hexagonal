@@ -55,7 +55,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
     }
 
     async assingGroups(groupElementEduSyncDto: GroupElementEduSyncDto[], institution: InstitutionEntity, student: StudentToMoodleDto): Promise<void> {
-        try {
+        try {            
             const groupsToAssign = groupElementEduSyncDto.map(group => {                
                 return new AssignGroupMoodleDto(group.externalId, student.id!)
             })

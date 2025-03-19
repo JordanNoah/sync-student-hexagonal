@@ -81,10 +81,10 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             if (error) {
                 throw CustomError.internalServer(error)
             }
-
-            const degreeEntity = await new DegreeDatasourceImpl().getByUuid(degreeEventDto!.uuid);
+            
+            const degreeEntity = await new DegreeDatasourceImpl().getByUuid(degreeEventDto!.degree.uuid);
             if (!degreeEntity) {
-                throw CustomError.notFound(`Degree with uuid ${degreeEventDto!.uuid} not found`)
+                throw CustomError.notFound(`Degree with uuid ${degreeEventDto!.degree.uuid} not found`)
             }
 
             await new DegreeDatasourceImpl().deleteById(degreeEntity.id);
@@ -112,10 +112,10 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             if (error) {
                 throw CustomError.internalServer(error)
             }
-
-            const degreeEntity = await new DegreeDatasourceImpl().getByUuid(degreeEventDto!.uuid);
+            
+            const degreeEntity = await new DegreeDatasourceImpl().getByUuid(degreeEventDto!.degree.uuid);
             if (!degreeEntity) {
-                throw CustomError.notFound(`Degree with uuid ${degreeEventDto!.uuid} not found`)
+                throw CustomError.notFound(`Degree with uuid ${degreeEventDto!.degree.uuid} not found`)
             }
 
             await new DegreeDatasourceImpl().deleteById(degreeEntity.id);

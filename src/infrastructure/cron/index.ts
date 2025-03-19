@@ -1,6 +1,6 @@
 import { CronJob } from 'cron';
 import InscriptionDatasourceImpl from '@/infrastructure/datasources/inscription.datasource.impl';
-import CronProcessorDatasourceImpl from '../datasources/cronProcessor.datasource.impl';
+import CronProcessorDatasourceImpl from '../datasources/cronProcessor.datasource.impl'; 
 
 let syncInscriptionsRunning = false
 let syncAcademicSelectionsRunning = false

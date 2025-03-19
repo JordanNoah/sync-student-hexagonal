@@ -55,6 +55,7 @@ export default class CronProcessorDatasourceImpl implements CronProcessorDatasou
                         // todo masive unenroll
                         await new MoodleDatasourceImpl().unenrollStudent(student, institution, courseEduSynchro.existingCourses)
                     }
+                    console.log('course: ',courseEduSynchro.existingCourses);
                     
                     await new MoodleDatasourceImpl().courseEnrolments(courseEduSynchro.existingCourses, courseUuid, student, institution)
                     
