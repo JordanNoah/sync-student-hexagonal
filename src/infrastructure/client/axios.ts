@@ -20,6 +20,7 @@ export class Axios {
         this.axiosInstance.interceptors.response.use(
             (response: AxiosResponse<any>) => {
                 const data = response.data;
+                
                 if (data && typeof data === 'object' && 'exception' in data) {
                     const errorResponse = data;
                     throw CustomError.internalServer(
@@ -28,9 +29,7 @@ export class Axios {
                 }
                 return { ...response, data };
             },
-            (error: AxiosError) => {
-                console.log('error', error);
-                
+            (error: AxiosError) => {                
                 return Promise.reject(error);
             }
         );

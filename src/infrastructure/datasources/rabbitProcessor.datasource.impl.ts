@@ -13,6 +13,11 @@ import ProgramOfferedEventDto from "@/domain/dtos/programOffered/programOffered.
 import ProgramOfferedDatasourceImpl from "./programOffered.datasource.impl";
 import appConstants from "@/shared/constants";
 import ChangeEnrollmentAcademicProgramEventDto from "@/domain/dtos/enrollment/enrollmentProgramChange.event.dto";
+import MoodleDatasourceImpl from "./moodle.datasource.impl";
+import DegreeEntity from "@/domain/entity/degree.entity";
+import InstitutionDatasourceImpl from "./institution.datasource.impl";
+import CronProcessorDatasourceImpl from "./cronProcessor.datasource.impl";
+import EducationalSynchroDatasourceImpl from "./educationalSynchro.datasource.impl";
 
 export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDatasource {
     async InscriptioRegisteredProcessor(message: RabbitMQMessageDto): Promise<void> {
@@ -37,6 +42,15 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             }
 
             await new AcademicSelectionDatasourceImpl().createUpdate(academicSelection!);
+
+            const enrollment = await new EnrollmentDatasourceImpl().getByUuid(academicSelection!.academicSelection.enrollmentUuid);
+            if (enrollment) {
+                const inscription = await new InscriptionDatasourceImpl().getByUuid(enrollment.inscriptionUuid);
+                if (inscription) {
+                    inscription.processed = false;
+                    await new InscriptionDatasourceImpl().updateByEntity(inscription);
+                }
+            }
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
@@ -54,9 +68,10 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
                 throw CustomError.notFound(`AcademicSelection with uuid ${academicSelectionDto!.uuid} not found`)
             }
 
+            
+            await new MoodleDatasourceImpl().discardAcademicSelection(academicSelectionEntity);
+
             await new AcademicSelectionDatasourceImpl().deleteById(academicSelectionEntity.id);
-
-
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
@@ -70,11 +85,20 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             }
 
             await new AcademicSelectionDatasourceImpl().createUpdate(academicSelection!);
+
+            const enrollment = await new EnrollmentDatasourceImpl().getByUuid(academicSelection!.academicSelection.enrollmentUuid);
+            if (enrollment) {
+                const inscription = await new InscriptionDatasourceImpl().getByUuid(enrollment.inscriptionUuid);
+                if (inscription) {
+                    inscription.processed = false;
+                    await new InscriptionDatasourceImpl().updateByEntity(inscription);
+                }
+            }
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
     }
-    async DegreeDeactivated(message: RabbitMQMessageDto): Promise<void> {    
+    async DegreeDeactivated(message: RabbitMQMessageDto): Promise<void> {
         try {
             const content = JSON.parse(message.content.toString());
             const [error, degreeEventDto] = DegreeEventDto.changeStatus(content);
@@ -87,11 +111,72 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
                 throw CustomError.notFound(`Degree with uuid ${degreeEventDto!.degree.uuid} not found`)
             }
 
+            let oldDegrees: DegreeEntity[] = []
+
+            const inscription = await new InscriptionDatasourceImpl().getByUuid(degreeEventDto!.degree.inscriptionUuid);
+            if (inscription && inscription.processed) {
+                oldDegrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscription.uuid);
+            }
+
             await new DegreeDatasourceImpl().deleteById(degreeEntity.id);
+
+
+            if (inscription && inscription.processed) {
+                const newDegrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscription.uuid);
+                const actualInstitution = await new InstitutionDatasourceImpl().getByDegrees(oldDegrees);
+                const newInstitution = await new InstitutionDatasourceImpl().getByDegrees(newDegrees);
+
+                if(actualInstitution?.abbreviation !== newInstitution?.abbreviation) {
+                    const student = await new MoodleDatasourceImpl().syncStudent(inscription.studentUuid, actualInstitution!)
+                    const academicRecord = await new InscriptionDatasourceImpl().getAcademicRecordByUuid(inscription.uuid)
+                    //desenrollar de moodle viejo 
+                    if (academicRecord) {
+                        const courseUuid = new MoodleDatasourceImpl().getListOfCourses(academicRecord)
+                        const courseUuidDto = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid,actualInstitution!)
+                        if(courseUuidDto.missingCourse.length > 0) {
+                            //TO DO enviar correo
+                        }
+                        if (courseUuidDto.existingCourses.length > 0) {
+                            await new MoodleDatasourceImpl().unenrollStudent(student, actualInstitution!,courseUuidDto.existingCourses)
+                            inscription.processed = false
+                            await new InscriptionDatasourceImpl().updateByEntity(inscription)
+                        }
+                        //enrollar en moodle nuevo
+
+                        if (newInstitution && newInstitution.active){
+                            const programCourse = courseUuidDto.existingCourses.find(course => course.uuid === academicRecord.inscription.programVersionUuid)
+                            if (programCourse) {
+
+                                if(!student.isCreated && (academicRecord.inscription.enrollments && academicRecord.inscription.enrollments.length > 0)) {
+                                    // todo masive unenroll
+                                    await new MoodleDatasourceImpl().unenrollStudent(student, newInstitution, courseUuidDto.existingCourses)
+                                }
+                            
+                                await new MoodleDatasourceImpl().courseEnrolments(courseUuidDto.existingCourses, courseUuid, student, newInstitution)
+                            
+                                const basicGroups = new MoodleDatasourceImpl().getListBasicGroups(courseUuidDto.existingCourses, academicRecord.inscription, newInstitution, courseUuidDto.existingCourses, courseUuid, programCourse)
+                            
+                                const eduGroups = await new EducationalSynchroDatasourceImpl().getGroups(basicGroups)
+                            
+                                if (eduGroups.missingGroups.length > 0) {
+                                    const createGroups = await new EducationalSynchroDatasourceImpl().createGroups(eduGroups.missingGroups, newInstitution, courseUuidDto.existingCourses)
+                                    eduGroups.existGroups.push(...createGroups)
+                                }
+                            
+                                await new MoodleDatasourceImpl().assingGroups(eduGroups.existGroups, newInstitution, student)
+                            
+                                //actualizar todo a hecho en db
+                                await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
+                            }
+                        }
+                    }
+                }
+            }
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
     }
+
     async DegreeRegistered(message: RabbitMQMessageDto): Promise<void> {
         try {
             const content = JSON.parse(message.content.toString());
@@ -100,11 +185,47 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
                 throw CustomError.internalServer(errorDegree)
             }
 
-            await new DegreeDatasourceImpl().createUpdate(degreeEventDto!);
+            let oldDegrees: DegreeEntity[] = []
+
+            const inscription = await new InscriptionDatasourceImpl().getByUuid(degreeEventDto!.degree.inscriptionUuid);
+            if (inscription && inscription.processed) {
+                oldDegrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscription.uuid);
+            }
+
+            const newDegree = await new DegreeDatasourceImpl().createUpdate(degreeEventDto!);
+
+            if (oldDegrees.length > 0) {
+                const actualInstitution = await new InstitutionDatasourceImpl().getByDegrees(oldDegrees);
+                const newInstitution = await new InstitutionDatasourceImpl().getByDegrees([newDegree, ...oldDegrees]);
+                if(actualInstitution?.abbreviation !== newInstitution?.abbreviation) {
+                    const inscription = await new InscriptionDatasourceImpl().getByUuid(newDegree.inscriptionUuid);
+                    if (inscription) {
+                        const student = await new MoodleDatasourceImpl().syncStudent(inscription.studentUuid, actualInstitution!)
+                        const academicRecord = await new InscriptionDatasourceImpl().getAcademicRecordByUuid(inscription.uuid)
+                        //desenrollar de moodle viejo 
+                        if (academicRecord) {
+                            const courseUuid = new MoodleDatasourceImpl().getListOfCourses(academicRecord)
+                            const courseUuidDto = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid,actualInstitution!)
+                            if(courseUuidDto.missingCourse.length > 0) {
+                                //TO DO enviar correo
+                            }
+
+                            if (courseUuidDto.existingCourses.length > 0) {
+                                await new MoodleDatasourceImpl().unenrollStudent(student, actualInstitution!,courseUuidDto.existingCourses)
+                                inscription.processed = false
+                                await new InscriptionDatasourceImpl().updateByEntity(inscription)
+                            }
+                            //enrollar en moodle nuevo
+                        }
+                    }
+                }
+            }
+
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
     }
+
     async DegreeWithdrawn(message: RabbitMQMessageDto): Promise<void> {
         try {
             const content = JSON.parse(message.content.toString());
@@ -118,7 +239,40 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
                 throw CustomError.notFound(`Degree with uuid ${degreeEventDto!.degree.uuid} not found`)
             }
 
+            let oldDegrees: DegreeEntity[] = []
+
+            const inscription = await new InscriptionDatasourceImpl().getByUuid(degreeEventDto!.degree.inscriptionUuid);
+            if (inscription && inscription.processed) {
+                oldDegrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscription.uuid);
+            }
+
             await new DegreeDatasourceImpl().deleteById(degreeEntity.id);
+
+
+            if (inscription && inscription.processed) {
+                const newDegrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscription.uuid);
+                const actualInstitution = await new InstitutionDatasourceImpl().getByDegrees(oldDegrees);
+                const newInstitution = await new InstitutionDatasourceImpl().getByDegrees(newDegrees);
+
+                if(actualInstitution?.abbreviation !== newInstitution?.abbreviation) {
+                    const student = await new MoodleDatasourceImpl().syncStudent(inscription.studentUuid, actualInstitution!)
+                    const academicRecord = await new InscriptionDatasourceImpl().getAcademicRecordByUuid(inscription.uuid)
+                    //desenrollar de moodle viejo 
+                    if (academicRecord) {
+                        const courseUuid = new MoodleDatasourceImpl().getListOfCourses(academicRecord)
+                        const courseUuidDto = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid,actualInstitution!)
+                        if(courseUuidDto.missingCourse.length > 0) {
+                            //TO DO enviar correo
+                        }
+                        if (courseUuidDto.existingCourses.length > 0) {
+                            await new MoodleDatasourceImpl().unenrollStudent(student, actualInstitution!,courseUuidDto.existingCourses)
+                            inscription.processed = false
+                            await new InscriptionDatasourceImpl().updateByEntity(inscription)
+                        }
+                        //enrollar en moodle nuevo
+                    }
+                }
+            }
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
@@ -170,6 +324,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             }
 
             inscriptionEntity.extensionFinishedAt = inscriptionDto!.inscription.newDate!;
+            inscriptionEntity.processed = false;
             await new InscriptionDatasourceImpl().updateByEntity(inscriptionEntity);
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
@@ -189,6 +344,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             }
 
             inscriptionEntity.status = appConstants.INSCRIPTIONSTATUS.ACTIVATED;
+            inscriptionEntity.processed = false;
             await new InscriptionDatasourceImpl().updateByEntity(inscriptionEntity);
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
@@ -208,11 +364,20 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             }
 
             inscriptionEntity.status = appConstants.INSCRIPTIONSTATUS.WITHDRAWN;
+
+            const degrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscriptionEntity.uuid);
+            const institution = await new InstitutionDatasourceImpl().getByDegrees(degrees);
+            if(inscriptionEntity.processed && degrees.length > 0){
+                //curso compartido
+            }
+            
+            inscriptionEntity.processed = true;
             await new InscriptionDatasourceImpl().updateByEntity(inscriptionEntity);
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
     }
+
     async ProgramChanged(message: RabbitMQMessageDto): Promise<void> {
         try {
             const content = JSON.parse(message.content.toString());
@@ -238,7 +403,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
 
             inscriptionEntity.programUuid = enrollmentDto!.enrollment.academicProgram.newElement.programUuid
             inscriptionEntity.programVersionUuid = enrollmentDto!.enrollment.academicProgram.newElement.programVersionUuid
-
+            inscriptionEntity.processed = false;
             await new InscriptionDatasourceImpl().updateByEntity(inscriptionEntity);
             //todo moodle change program
 
@@ -246,6 +411,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
     }
+
     async ProgramEndDateEstablished(message: RabbitMQMessageDto): Promise<void> {
         try {
             const content = JSON.parse(message.content.toString());
@@ -260,6 +426,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             }
 
             inscriptionEntity.programFinishedAt = inscriptionDto!.inscription.newDate!;
+            inscriptionEntity.processed = false;
             await new InscriptionDatasourceImpl().updateByEntity(inscriptionEntity);
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
@@ -294,6 +461,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             }
 
             inscriptionEntity.programStartedAt = inscriptionDto!.inscription.newDate!;
+            inscriptionEntity.processed = false;
             await new InscriptionDatasourceImpl().updateByEntity(inscriptionEntity);
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
@@ -313,6 +481,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             }
 
             inscriptionEntity.registeredAt = inscriptionDto!.inscription.newDate!;
+            inscriptionEntity.processed = false;
             await new InscriptionDatasourceImpl().updateByEntity(inscriptionEntity);
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
