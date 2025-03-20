@@ -54,7 +54,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                         
                             if (eduGroups.missingGroups.length > 0) {
                                 const createGroups = await new EducationalSynchroDatasourceImpl().createGroups(eduGroups.missingGroups, institution, courseEduSynchro.existingCourses)
-                                console.log("grupos a crear: ",eduGroups);
+                                console.log("grupos a crear: ",createGroups);
                                 
                                 eduGroups.existGroups.push(...createGroups)
                             }
