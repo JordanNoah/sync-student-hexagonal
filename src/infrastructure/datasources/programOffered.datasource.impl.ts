@@ -31,4 +31,19 @@ export default class ProgramOfferedDatasourceImpl implements ProgramOfferedDatas
             return Promise.reject(error);
         }
     }
+
+    async findByUuid(uuid: string): Promise<AcademicPeriodEntity | undefined> {
+        try {
+            const period = await AcademicPeriodSequelize.findOne({
+                where: {
+                    uuid: uuid
+                }
+            })
+            if (!period) return undefined
+            return AcademicPeriodEntity.fromRow(period)
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
 }

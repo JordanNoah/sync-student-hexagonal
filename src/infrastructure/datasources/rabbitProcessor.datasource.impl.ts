@@ -131,7 +131,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
                     const academicRecord = await new InscriptionDatasourceImpl().getAcademicRecordByUuid(inscription.uuid)
                     //desenrollar de moodle viejo 
                     if (academicRecord) {
-                        const courseUuid = new MoodleDatasourceImpl().getListOfCourses(academicRecord)
+                        const courseUuid = await new MoodleDatasourceImpl().getListOfCourses(academicRecord)
                         const courseUuidDto = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid,actualInstitution!)
                         if(courseUuidDto.missingCourse.length > 0) {
                             //TO DO enviar correo
@@ -154,7 +154,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
                             
                                 await new MoodleDatasourceImpl().courseEnrolments(courseUuidDto.existingCourses, courseUuid, student, newInstitution)
                             
-                                const basicGroups = new MoodleDatasourceImpl().getListBasicGroups(courseUuidDto.existingCourses, academicRecord.inscription, newInstitution, courseUuidDto.existingCourses, courseUuid, programCourse)
+                                const basicGroups = new MoodleDatasourceImpl().getListBasicGroups(courseUuidDto.existingCourses, academicRecord.inscription, newInstitution, courseUuid, programCourse)
                             
                                 const eduGroups = await new EducationalSynchroDatasourceImpl().getGroups(basicGroups)
                             
@@ -204,7 +204,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
                         const academicRecord = await new InscriptionDatasourceImpl().getAcademicRecordByUuid(inscription.uuid)
                         //desenrollar de moodle viejo 
                         if (academicRecord) {
-                            const courseUuid = new MoodleDatasourceImpl().getListOfCourses(academicRecord)
+                            const courseUuid = await new MoodleDatasourceImpl().getListOfCourses(academicRecord)
                             const courseUuidDto = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid,actualInstitution!)
                             if(courseUuidDto.missingCourse.length > 0) {
                                 //TO DO enviar correo
@@ -259,7 +259,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
                     const academicRecord = await new InscriptionDatasourceImpl().getAcademicRecordByUuid(inscription.uuid)
                     //desenrollar de moodle viejo 
                     if (academicRecord) {
-                        const courseUuid = new MoodleDatasourceImpl().getListOfCourses(academicRecord)
+                        const courseUuid = await new MoodleDatasourceImpl().getListOfCourses(academicRecord)
                         const courseUuidDto = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid,actualInstitution!)
                         if(courseUuidDto.missingCourse.length > 0) {
                             //TO DO enviar correo

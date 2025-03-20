@@ -29,7 +29,8 @@ export default class AcademicSelectionEntity {
             row.startedAt,
             row.finishedAt,
             row.callUuid,
-            row.processedAt
+            row.processedAt,
+            row.academicPeriod
         )
     }
 }

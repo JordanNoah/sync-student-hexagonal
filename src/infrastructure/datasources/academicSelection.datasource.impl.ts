@@ -5,6 +5,7 @@ import { CustomError } from "@/domain/errors/custom.error";
 import { AcademicSelectionSequelize } from "../database/models";
 import { addMinutes } from "@/shared/utils";
 import { Op } from "sequelize";
+import ProgramOfferedDatasourceImpl from "./programOffered.datasource.impl";
 
 export default class AcademicSelectionDatasourceImpl implements AcademicSelectionDatasource {
     async createUpdate(academicSelectionEventDto: AcademicSelectionEventDto): Promise<AcademicSelectionEntity> {
@@ -78,7 +79,15 @@ export default class AcademicSelectionDatasourceImpl implements AcademicSelectio
                     enrollmentUuid: enrollmentUuid
                 }
             })
-            
+            if (academicSelections.length === 0) return []
+
+            for (const element of academicSelections) {
+                if (element.callUuid) {
+                    element.academicPeriod = await new ProgramOfferedDatasourceImpl().findByUuid(element.callUuid)
+                } else {
+                    element.academicPeriod = undefined
+                }
+            }
             return academicSelections.map(academicSelection => AcademicSelectionEntity.fromRow(academicSelection))
         } catch (error) {
             CustomError.throwAnError(error)

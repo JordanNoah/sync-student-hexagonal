@@ -15,7 +15,7 @@ export default abstract class MoodleDatasource {
     abstract unenrollStudent(student: StudentToMoodleDto, institution: InstitutionEntity, courses:CoursesUuidDto[]): Promise<void>;
     abstract discardAcademicSelection(AcademicSelectionEntity:AcademicSelectionEntity): Promise<void>;
     abstract enrollFromAcademicRecord(academicRecord: AcademicRecordEntity): Promise<void>;
-    abstract getListOfCourses(academicRecord:AcademicRecordEntity, institution:InstitutionEntity): any[]
+    abstract getListOfCourses(academicRecord:AcademicRecordEntity, institution:InstitutionEntity): Promise<CourseUuid[]>
     abstract getAcademicPeriodString(academicSelection:AcademicSelectionEntity): string | undefined
-    abstract getListBasicGroups(coursesUuidDto:CoursesUuidDto[], inscription:InscriptionEntity, institution:InstitutionEntity, existingCourses: CoursesUuidDto[], listOfCourses: CourseUuid[], programCourse: CoursesUuidDto): GroupCheckEduSyncDto[]
+    abstract getListBasicGroups(coursesUuidDto:CoursesUuidDto[], inscription:InscriptionEntity, institution:InstitutionEntity, listOfCourses: CourseUuid[], programCourse: CoursesUuidDto): GroupCheckEduSyncDto[]
 }

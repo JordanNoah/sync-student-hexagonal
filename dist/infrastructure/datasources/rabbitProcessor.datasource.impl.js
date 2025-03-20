@@ -141,7 +141,7 @@ class RabbitProcessorDatasourceImpl {
                         const academicRecord = yield new inscription_datasource_impl_1.default().getAcademicRecordByUuid(inscription.uuid);
                         //desenrollar de moodle viejo 
                         if (academicRecord) {
-                            const courseUuid = new moodle_datasource_impl_1.default().getListOfCourses(academicRecord);
+                            const courseUuid = yield new moodle_datasource_impl_1.default().getListOfCourses(academicRecord);
                             const courseUuidDto = yield new educationalSynchro_datasource_impl_1.default().getCourses(courseUuid, actualInstitution);
                             if (courseUuidDto.missingCourse.length > 0) {
                                 //TO DO enviar correo
@@ -160,7 +160,7 @@ class RabbitProcessorDatasourceImpl {
                                         yield new moodle_datasource_impl_1.default().unenrollStudent(student, newInstitution, courseUuidDto.existingCourses);
                                     }
                                     yield new moodle_datasource_impl_1.default().courseEnrolments(courseUuidDto.existingCourses, courseUuid, student, newInstitution);
-                                    const basicGroups = new moodle_datasource_impl_1.default().getListBasicGroups(courseUuidDto.existingCourses, academicRecord.inscription, newInstitution, courseUuidDto.existingCourses, courseUuid, programCourse);
+                                    const basicGroups = new moodle_datasource_impl_1.default().getListBasicGroups(courseUuidDto.existingCourses, academicRecord.inscription, newInstitution, courseUuid, programCourse);
                                     const eduGroups = yield new educationalSynchro_datasource_impl_1.default().getGroups(basicGroups);
                                     if (eduGroups.missingGroups.length > 0) {
                                         const createGroups = yield new educationalSynchro_datasource_impl_1.default().createGroups(eduGroups.missingGroups, newInstitution, courseUuidDto.existingCourses);
@@ -205,7 +205,7 @@ class RabbitProcessorDatasourceImpl {
                             const academicRecord = yield new inscription_datasource_impl_1.default().getAcademicRecordByUuid(inscription.uuid);
                             //desenrollar de moodle viejo 
                             if (academicRecord) {
-                                const courseUuid = new moodle_datasource_impl_1.default().getListOfCourses(academicRecord);
+                                const courseUuid = yield new moodle_datasource_impl_1.default().getListOfCourses(academicRecord);
                                 const courseUuidDto = yield new educationalSynchro_datasource_impl_1.default().getCourses(courseUuid, actualInstitution);
                                 if (courseUuidDto.missingCourse.length > 0) {
                                     //TO DO enviar correo
@@ -254,7 +254,7 @@ class RabbitProcessorDatasourceImpl {
                         const academicRecord = yield new inscription_datasource_impl_1.default().getAcademicRecordByUuid(inscription.uuid);
                         //desenrollar de moodle viejo 
                         if (academicRecord) {
-                            const courseUuid = new moodle_datasource_impl_1.default().getListOfCourses(academicRecord);
+                            const courseUuid = yield new moodle_datasource_impl_1.default().getListOfCourses(academicRecord);
                             const courseUuidDto = yield new educationalSynchro_datasource_impl_1.default().getCourses(courseUuid, actualInstitution);
                             if (courseUuidDto.missingCourse.length > 0) {
                                 //TO DO enviar correo

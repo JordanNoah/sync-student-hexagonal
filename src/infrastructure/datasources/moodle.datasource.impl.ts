@@ -21,13 +21,14 @@ import AcademicRecordEntity from "@/domain/entity/academicRecord.entity";
 import { getOnlyYearAndMonth } from "@/shared/utils";
 import GroupCheckEduSyncDto from "@/domain/dtos/educationalSynchro/groupCheck.eduSync.dto";
 import InscriptionEntity from "@/domain/entity/inscription.entity";
+import ProgramOfferedDatasourceImpl from "./programOffered.datasource.impl";
 
 export default class MoodleDatasourceImpl implements MoodleDatasource {
     async enrollFromAcademicRecord(academicRecord: AcademicRecordEntity): Promise<void> {
         try {
             const institution = await new InstitutionDatasourceImpl().getByDegrees(academicRecord.inscription.degrees!)
                 if (institution) {
-                    const courseUuid: CourseUuid[] = this.getListOfCourses(academicRecord)
+                    const courseUuid = await this.getListOfCourses(academicRecord)
                     const courseEduSynchro = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid, institution)
 
                     if (courseEduSynchro.missingCourse.length > 0) {
@@ -46,7 +47,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                         
                             await new MoodleDatasourceImpl().courseEnrolments(courseEduSynchro.existingCourses, courseUuid, student, institution)
                         
-                            const basicGroups = this.getListBasicGroups(courseEduSynchro.existingCourses, academicRecord.inscription, institution, courseEduSynchro.existingCourses, courseUuid, programCourse)
+                            const basicGroups = this.getListBasicGroups(courseEduSynchro.existingCourses, academicRecord.inscription, institution, courseUuid, programCourse)
                         
                             const eduGroups = await new EducationalSynchroDatasourceImpl().getGroups(basicGroups)
                         
@@ -171,9 +172,10 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
         }
     }
 
-    getListOfCourses(academicRecord: AcademicRecordEntity): CourseUuid[] {
+    async getListOfCourses(academicRecord: AcademicRecordEntity): Promise<CourseUuid[]> {
         try {
             const coursesUuids: CourseUuid[] = []
+            
             //programa
             coursesUuids.push(new CourseUuid(
                 "program",
@@ -226,16 +228,22 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
         }
     }
 
-    getListBasicGroups(coursesUuidDto:CoursesUuidDto[], inscription:InscriptionEntity, institution:InstitutionEntity, existingCourses: CoursesUuidDto[], listOfCourses: CourseUuid[], programCourse: CoursesUuidDto): GroupCheckEduSyncDto[] {
+    getListBasicGroups(coursesUuidDto:CoursesUuidDto[], inscription:InscriptionEntity, institution:InstitutionEntity, listOfCourses: CourseUuid[], programCourse: CoursesUuidDto): GroupCheckEduSyncDto[] {
         try {
             const groupsToChech = coursesUuidDto.flatMap(
                 course => {
                     let arrayOfGroups = [
                         new GroupCheckEduSyncDto(`lang.${inscription.lang.toLowerCase()}`,course.id),
                         new GroupCheckEduSyncDto(`org.${institution.abbreviation.toLowerCase()}`,course.id),
-                        new GroupCheckEduSyncDto(`program.${programCourse.shortName!.toLowerCase()}`,course.id),
+                        new GroupCheckEduSyncDto(`program.${programCourse.shortName!.split("-")[0]!.toLowerCase()}`,course.id),
                     ]
 
+                    const coursedata = listOfCourses.find(courseuuid => courseuuid.uuid === course.uuid)
+                    if (coursedata && coursedata.academicPeriod) {
+                        arrayOfGroups.push(
+                            new GroupCheckEduSyncDto(`term.${coursedata.academicPeriod}`,course.id)
+                        )
+                    }
                     return arrayOfGroups
                 }
             )

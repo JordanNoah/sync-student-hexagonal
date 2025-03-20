@@ -1,0 +1,129 @@
+asyncapi: 3.0.0
+info:
+  title: Sync student hexagonal service
+  version: 1.0.0
+  description: This is a student service that synchronizes data with multiple Moodles.
+  contact:
+    name: Teaching Action
+    email: teaching.action@funiber.org
+  license:
+    name: MIT
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  development:
+    protocol: amqp
+    description: Development RabbitMQ
+    host: localhost
+
+channels:
+  academic-administration.inscription-management.inscription_registered:
+    address: academic-administration.inscription-management.inscription_registered
+    messages:
+      InscriptionRegistered:
+        $ref: "#/components/messages/InscriptionRegistered"
+    description: Sent by inscription management when an inscription is registered.
+
+components:
+  messages:
+    InscriptionRegistered:
+      name: InscriptionRegistered
+      description: Inform about a new registration.
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/InscriptionRegisteredPayload"
+
+  schemas:
+    InscriptionRegisteredPayload:
+      title: The Inscription Payload
+      type: object
+      description: Object containing all the information about an inscription.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Unique ID for the Object
+        student_uuid:
+          type: string
+          format: uuid
+          description: Unique ID for the student
+        academic_program:
+          $ref: "#/components/schemas/ProgramPayload"
+        introductory_module:
+          type: object
+          properties:
+            program_version_uuid:
+              type: string
+              format: uuid
+              description: Unique ID for the Object
+            program_uuid:
+              type: string
+              format: uuid
+              description: Unique ID for the Object
+            academic_element_uuid:
+              type: string
+              format: uuid
+              description: Unique ID for the Object
+        institution_abbreviation:
+          type: string
+          description: Current name of the institution facilitating the enrollment under Funiber group's brand names.
+          enum:
+            - FBR
+            - UEA
+            - UNIB
+            - UNINIMX
+            - UNINCOL
+            - UNIC
+            - UNIROMANA
+        modality:
+          type: string
+          description: Modality represents the study mode of the inscription.
+          enum:
+            - _VIRTUAL
+            - _PRESENCIAL
+        status:
+          type: string
+          description: State in which the registration is located.
+          enum:
+            - AC
+            - PR
+            - TS
+            - FZ
+            - PE
+            - BA
+        content_language:
+          type: string
+          description: The default language of communication, using ISO 639-1 Code.
+          example: es
+        created_at:
+          type: string
+          format: date-time
+          description: The created date.
+        registered_at:
+          type: string
+          format: date-time
+          description: Registered date.
+        program_started_at:
+          type: string
+          format: date-time
+          description: Start Date.
+        program_finished_at:
+          type: string
+          format: date-time
+          description: Finish Date.
+        extension_finished_at:
+          type: string
+          format: date-time
+          description: End date of registration extension if granted.
+
+    ProgramPayload:
+      type: object
+      description: Contains details about the academic program.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Unique ID for the program.
+        name:
+          type: string
+          description: Program name.
