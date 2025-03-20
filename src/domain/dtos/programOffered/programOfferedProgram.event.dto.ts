@@ -1,8 +1,8 @@
 export default class ProgramOfferedProgramEventDto {
     constructor(
         public uuid: string,
-        public version: string,
-        public abbreviation: string
+        public abbreviation: string,
+        public version?: string | null,
     ){}
 
     static create(object: { [key: string]: any }): [string?, ProgramOfferedProgramEventDto?] {
