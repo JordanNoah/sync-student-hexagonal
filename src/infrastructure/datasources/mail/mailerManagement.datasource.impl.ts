@@ -30,17 +30,6 @@ export class MailerManagmentDatasourceImpl implements MailerManagmentDatasource 
                 programIdNumber: '123456'
             };
 
-            console.log('Creating email request with the following data:', {
-                studentUuid,
-                notificationAbbreviation: appConstants.MAILER.NOTIFICATIONS.COURSE_NOT_FOUND.ABBREVIATION,
-                templateAbbreviation: appConstants.MAILER.TEMPLATE.BASE.ABBREVIATION,
-                contentAbbreviation: appConstants.MAILER.CONTENT.COURSE_NOT_FOUND.ABBREVIATION,
-                to: [],
-                cc: [],
-                bcc: [],
-                placeholders
-            });
-
             const [error, emailRequestDto] = MailerRequestDto.create({
                 studentInscription: studentUuid,
                 notificationAbbreviation: appConstants.MAILER.NOTIFICATIONS.COURSE_NOT_FOUND.ABBREVIATION,
@@ -51,9 +40,7 @@ export class MailerManagmentDatasourceImpl implements MailerManagmentDatasource 
                 bcc: [],
                 placeholders
             });
-
-            console.log('EmailRequestDto:', emailRequestDto);
-            
+                        
             if (error) throw CustomError.internalServer('Error creating EmailRequestDto');
             if (emailRequestDto) await this.buildEmailNotificationDatasourceImpl.sendNotification(emailRequestDto);
         } catch (error: any) {
