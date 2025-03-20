@@ -21,6 +21,7 @@ import AcademicRecordEntity from "@/domain/entity/academicRecord.entity";
 import { getOnlyYearAndMonth } from "@/shared/utils";
 import GroupCheckEduSyncDto from "@/domain/dtos/educationalSynchro/groupCheck.eduSync.dto";
 import InscriptionEntity from "@/domain/entity/inscription.entity";
+import { MailerManagmentDatasourceImpl } from "./mail/mailerManagement.datasource.impl";
 
 export default class MoodleDatasourceImpl implements MoodleDatasource {
     async enrollFromAcademicRecord(academicRecord: AcademicRecordEntity): Promise<void> {
@@ -32,6 +33,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
 
                     if (courseEduSynchro.missingCourse.length > 0) {
                         //todo: correo electronico avisando la falta de cursos
+                        await new MailerManagmentDatasourceImpl().notificationCNF(academicRecord)
                     }
 
                     if (courseEduSynchro.existingCourses.length > 0) {
@@ -161,7 +163,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                 }
 
                 if (courses.missingCourse.length > 0){
-                    //TO DO: enviar correo de curso faltante
+                    //await new MailerManagmentDatasourceImpl().notificationCNF(academicRecord)
                 }
                 
             }

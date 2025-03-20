@@ -54,16 +54,7 @@ export class Server {
                 await RabbitMQR.init();
                 await new CronProcessorDatasourceImpl().processInscriptions();
     
-                // ======= Enviar correo desde el datasource ======= //     
-                try {
-                    const mailerDatasource = new MailerManagmentDatasourceImpl();
                 
-                    console.log("Llamando a notificationCNF()..."); // Agregar log antes de llamar
-                    await mailerDatasource.notificationCNF();
-                    console.log("Correo enviado correctamente desde el datasource.");
-                } catch (emailError) {
-                    console.error("Error enviando correo desde el datasource:", emailError);
-                }
                 
             }).catch(error => {
                 console.log(error);
