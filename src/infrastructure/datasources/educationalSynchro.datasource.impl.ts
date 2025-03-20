@@ -50,7 +50,7 @@ export default class EducationalSynchroDatasourceImpl implements EducationalSync
             })
             
             const createdGroups = await new ExternalEducationalSyncApiRepository().createGroups(moodleGroups, institution)        
-            console.log('esto si se creo',createdGroups)   
+            console.log('esto si se creo',createdGroups.data)   
             
             return createdGroups.data.map((group:any) => GroupElementEduSyncDto.fromExternal(group))
         } catch (error) {
