@@ -46,7 +46,8 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                             }
                         
                             await new MoodleDatasourceImpl().courseEnrolments(courseEduSynchro.existingCourses, courseUuid, student, institution)
-                        
+                            console.log(courseEduSynchro.existingCourses, academicRecord.inscription, institution, courseUuid, programCourse);
+                            
                             const basicGroups = this.getListBasicGroups(courseEduSynchro.existingCourses, academicRecord.inscription, institution, courseUuid, programCourse)
                         
                             const eduGroups = await new EducationalSynchroDatasourceImpl().getGroups(basicGroups)
