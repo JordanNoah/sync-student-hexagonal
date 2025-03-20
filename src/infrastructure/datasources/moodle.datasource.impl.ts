@@ -244,6 +244,8 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                             new GroupCheckEduSyncDto(`term.${coursedata.academicPeriod}`,course.id)
                         )
                     }
+                    console.log(arrayOfGroups);
+                    
                     return arrayOfGroups
                 }
             )
