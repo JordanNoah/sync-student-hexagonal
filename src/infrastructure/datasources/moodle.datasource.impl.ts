@@ -112,9 +112,10 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
             const groupsToAssign = groupElementEduSyncDto.map(group => {                
                 return new AssignGroupMoodleDto(group.externalId, student.id!)
             })
+
             console.log(groupsToAssign);
             
-            await new ExternalMoodleApiRepository(institution).assignUserToGroup(JSON.parse(JSON.stringify(groupsToAssign)));
+            await new ExternalMoodleApiRepository(institution).assignUserToGroup(groupsToAssign);
             
         } catch (error) {
             CustomError.throwAnError(error)
