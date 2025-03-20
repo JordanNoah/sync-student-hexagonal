@@ -30,17 +30,12 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                 if (institution) {
                     const courseUuid: CourseUuid[] = this.getListOfCourses(academicRecord)
                     const courseEduSynchro = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid, institution)
-
-                    if (courseEduSynchro.missingCourse.length > 0) {
-                        //todo: correo electronico avisando la falta de cursos
-                        await new MailerManagmentDatasourceImpl().notificationCNF(academicRecord)
-                    }
-
+                    let programCourse = null
+                    let student = null
                     if (courseEduSynchro.existingCourses.length > 0) {
-                        const programCourse = courseEduSynchro.existingCourses.find(course => course.uuid === academicRecord.inscription.programVersionUuid)
+                        programCourse = courseEduSynchro.existingCourses.find(course => course.uuid === academicRecord.inscription.programVersionUuid)
+                        student = await new MoodleDatasourceImpl().syncStudent(academicRecord.inscription.studentUuid!, institution)
                         if (programCourse) {
-                            const student = await new MoodleDatasourceImpl().syncStudent(academicRecord.inscription.studentUuid!, institution)
-
                             if(!student.isCreated && (academicRecord.inscription.enrollments && academicRecord.inscription.enrollments.length > 0)) {
                                 // todo masive unenroll
                                 await new MoodleDatasourceImpl().unenrollStudent(student, institution, courseEduSynchro.existingCourses)
@@ -62,6 +57,11 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                             //actualizar todo a hecho en db
                             await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
                         }
+                    }
+
+                    if (courseEduSynchro.missingCourse.length > 0) {
+                        //todo: correo electronico avisando la falta de cursos
+                        await new MailerManagmentDatasourceImpl().notificationCNF(academicRecord, programCourse!, student!, institution)
                     }
                 }
                 
@@ -158,12 +158,27 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
             if (inscription.processed) {
                 const student = await this.syncStudent(inscription.studentUuid, institution)
                 const courses = await new EducationalSynchroDatasourceImpl().getCourses([new CourseUuid('course',AcademicSelectionEntity.academicElementUuid)], institution)
+
+                const courseProgram = [new CourseUuid('program',inscription.programVersionUuid!,inscription.programStartedAt,inscription.programFinishedAt)]
+                const courseP = await new EducationalSynchroDatasourceImpl().getCourses(courseProgram, institution) //programa
+                const programCourse = courseP.existingCourses.find(course => course.uuid === inscription.programVersionUuid) 
+
+                console.log(programCourse);
+                
                 if (courses.existingCourses.length > 0) {
                     await this.unenrollStudent(student, institution, courses.existingCourses)
                 }
 
                 if (courses.missingCourse.length > 0){
-                    //await new MailerManagmentDatasourceImpl().notificationCNF(academicRecord)
+                    enrollment.academicSelections = [AcademicSelectionEntity]
+                    inscription.degrees = degrees
+                    inscription.enrollments = [enrollment]
+                    const academicRecordEntity = new AcademicRecordEntity(
+                        inscription,
+                    )
+
+                    await new MailerManagmentDatasourceImpl().notificationCNF(academicRecordEntity, programCourse!, student, institution)
+
                 }
                 
             }

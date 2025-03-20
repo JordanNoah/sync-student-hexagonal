@@ -5,6 +5,11 @@ import AcademicRecordEntity from "@/domain/entity/academicRecord.entity";
 import appConstants from "@/shared/constants";
 import MailerRequestDto from "@/domain/dtos/mail/mailerRequest.dto";
 import SgDatasourceImpl from "../sg.datasource.impl";
+import CoursesEduSyncDto, { CoursesUuidDto } from "@/domain/dtos/educationalSynchro/course.eduSync.dto";
+import InstitutionEntity from "@/domain/entity/institution.entity";
+import EducationalSynchroDatasourceImpl from "../educationalSynchro.datasource.impl";
+import StudentToMoodleDto from "@/domain/dtos/moodle/student.moodle.dto";
+import AcademicSelectionEntity from "@/domain/entity/academicSelection.entity";
 
 export class MailerManagmentDatasourceImpl implements MailerManagmentDatasource {
     private readonly buildEmailNotificationDatasourceImpl: MailerBuilderNotificationDatasourceImpl;
@@ -14,28 +19,26 @@ export class MailerManagmentDatasourceImpl implements MailerManagmentDatasource 
 
     }
 
-    async notificationCNF(academicRecord: AcademicRecordEntity): Promise<void> {
+    async notificationCNF(academicRecord: AcademicRecordEntity, programCourse: CoursesUuidDto, student: StudentToMoodleDto, institution: InstitutionEntity): Promise<void> {
         try {
             const studentUuid = academicRecord.inscription.studentUuid
-            // sgStudent = await new SgDatasourceImpl().getStudent(studentUuid)
-            const studentUsername = 'LAKSD123J'
-            //sgStudent.credentials[0].username
-            const institutionAbbreviation = academicRecord.inscription.institutionAbbreviation
-            const programVersion = academicRecord.inscription.enrollments?.[0]?.programVersion;
-            if (!programVersion) {
-                throw CustomError.internalServer('Program version is undefined');
-            }
-            
+            const studentUsername = student.username
+            const program = programCourse.shortName
+            const institutionAbbreviation = institution.abbreviation
+            const programVersion = academicRecord.inscription.enrollments?.[0].programVersion;
+            const programUuid = academicRecord.inscription.enrollments?.[0].programUuid;
+            const programIdNumber = `${programUuid}||${programVersion}`;
+            const asignatureUuid = academicRecord.inscription.enrollments?.[0].academicSelections?.[0]?.academicElementUuid;
 
             const placeholders = {
                 courseAbbreviation: 'ABBBBB',
-                courseIdNumber: '123456',
+                courseIdNumber: asignatureUuid,
                 institutionAbbreviation: institutionAbbreviation,
                 studentUsername: studentUsername,
                 studentIdNumber: studentUuid,
-                program: 'PROGRAM',
+                program: program,
                 programVersion: programVersion,
-                programIdNumber: '123456'
+                programIdNumber: programIdNumber
             };
 
             const [error, emailRequestDto] = MailerRequestDto.create({
