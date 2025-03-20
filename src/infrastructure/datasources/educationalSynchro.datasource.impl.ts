@@ -41,12 +41,14 @@ export default class EducationalSynchroDatasourceImpl implements EducationalSync
     async createGroups(groups: MissingGroupEduSyncDto[], institution:InstitutionEntity, courseUuids: CoursesUuidDto[]): Promise<GroupElementEduSyncDto[]> {
         try {
             const moodleGroups = groups.map(group => {
-                return GroupMoodleDto.create({
+                const moodleGroup = GroupMoodleDto.create({
                     courseid: courseUuids.find(course => course.id === group.courseId)?.externalId,
                     name: group.groupIdNumber,
                     idnumber: group.groupIdNumber,
                     description: group.groupIdNumber,
-                })
+                });
+                console.log('Created Moodle Group:', moodleGroup);
+                return moodleGroup;
             })
             
             const createdGroups = await new ExternalEducationalSyncApiRepository().createGroups(moodleGroups, institution)        
