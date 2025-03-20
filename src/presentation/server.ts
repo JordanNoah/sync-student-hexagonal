@@ -6,13 +6,9 @@ import { RabbitMQResilienceRoutes, RabbitMQResilienceSocketManager } from "rabbi
 import { serve } from "@hono/node-server";
 import { RabbitMQR } from "@/infrastructure/rabbitmq";
 import AppRoutes from "./routes";
-<<<<<<< HEAD
 import CronProcessorDatasourceImpl from "@/infrastructure/datasources/cronProcessor.datasource.impl";
 import AcademicRecordEntity from "@/domain/entity/academicRecord.entity";
 import { MailerManagmentDatasourceImpl } from "@/infrastructure/datasources/mail/mailerManagement.datasource.impl";
-=======
-import { syncInscriptions } from "@/infrastructure/cron";
->>>>>>> 7b1ba18351c7902c60d99629732617a09df4e494
 
 interface Options {
     port?: number
@@ -42,7 +38,6 @@ export class Server {
                         status: "success",
                         message: "Welcome to sync student service"
                     });
-<<<<<<< HEAD
                 });
     
                 this.app.route('/api', new AppRoutes().routes);
@@ -70,20 +65,6 @@ export class Server {
                     console.error("Error enviando correo desde el datasource:", emailError);
                 }
                 
-=======
-
-                    this.app.route('/api', new AppRoutes().routes)
-                    const  server = serve({
-                        fetch: this.app.fetch,
-                        port: this.port
-                    }, (info) => {
-                        console.log(`Server running on port ${info.port}`)
-                    })
-                    //initialize socket manager
-                    RabbitMQResilienceSocketManager.initialize(server, '/websocket/')
-                    await RabbitMQR.init()
-                    syncInscriptions.start()
->>>>>>> 7b1ba18351c7902c60d99629732617a09df4e494
             }).catch(error => {
                 console.log(error);
             });

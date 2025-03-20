@@ -52,8 +52,7 @@ export class MailerTemplateContentDatasourceImpl implements MailerTemplateConten
             }
             //build html
             return this.assembleTemplate(
-                templateEntity, contentEntity.bodyHeader, contentEntity.bodyDescription, contentEntity.body ?? '', contentEntity.bodyLastDescription, 
-                contentEntity.bodySecondaryDescription ?? '', contentEntity.bodySecondary ?? ''
+                templateEntity, contentEntity.bodyHeader, contentEntity.bodyDescription, contentEntity.body ?? '', contentEntity.bodySecondaryDescription ?? '', contentEntity.bodySecondary ?? '', contentEntity.bodyLastDescription, 
             );
         } catch (error: any) {
             if (error instanceof CustomError) {
@@ -64,8 +63,8 @@ export class MailerTemplateContentDatasourceImpl implements MailerTemplateConten
     }
 
 
-    private assembleTemplate(mailerTemplate: MailerTemplateEntity, dynamicBodyHeader: string, dynamicBodyDescription: string, dynamicBodySecondaryDescription: string,
-        dynamicBody: string, dynamicSecondaryBody: string, dynamicBodyLastDescription: string): string {
+    private assembleTemplate(mailerTemplate: MailerTemplateEntity, dynamicBodyHeader: string, dynamicBodyDescription: string, dynamicBody: string, dynamicBodySecondaryDescription: string,
+         dynamicSecondaryBody: string, dynamicBodyLastDescription: string): string {
         return `
         ${mailerTemplate.doctype}
         ${mailerTemplate.head}

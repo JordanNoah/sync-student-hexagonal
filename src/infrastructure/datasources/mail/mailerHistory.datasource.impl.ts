@@ -7,9 +7,7 @@ import { MailerHistorySequelize, MailerNotificationStatus } from "@/infrastructu
 
 export class MailerHistoryDatasourceImpl implements MailerHistoryDatasource {
     async register (mailerHistoryDto: MailerHistoryDto): Promise<MailerHistoryEntity> {
-        try {
-            console.log(mailerHistoryDto);
-            
+        try {            
             const [mailerHistory] = await MailerHistorySequelize.findOrCreate({
                 where: {
                     mailerNotificationId: mailerHistoryDto.mailerNotificationId,

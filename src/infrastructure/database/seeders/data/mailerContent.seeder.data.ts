@@ -17,7 +17,7 @@ export const MailerContentSeederData = [
         </p>
         `,
         bodySecondaryDescription: `
-        <p style="margin: 0 0 15px 0; color: #424242; font-family: 'Open Sans', sans-serif; font-size: 12px;"><strong>Datos correspondientes del estudiante y su inscripción:</strong>
+        <p style="margin: 10px 0 15px 0; color: #424242; font-family: 'Open Sans', sans-serif; font-size: 12px;"><strong>Datos correspondientes del estudiante y su inscripción:</strong>
         `,
         body: `
         <tr>
@@ -31,7 +31,7 @@ export const MailerContentSeederData = [
         <tr>
             <td width="200" style="background-color: #f5f5f5; padding: 10px 16px;">Campus:</td>
             <td style="padding: 10px 16px;">{{institutionAbbreviation}}</td>
-        </tr> <br><br>
+        </tr>
         `,
         bodySecondary: `
         <tr>

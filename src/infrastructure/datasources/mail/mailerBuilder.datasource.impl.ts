@@ -56,13 +56,14 @@ export class MailerBuilderNotificationDatasourceImpl implements MailerBuilderNot
                 )) ?? '';
             };
 
-            return {
+            const notificationDetails = {
                 to: getField(getTo(), this.mailerRequestDto?.to),
-                subject: environmentPrefix + this.renderTemplateWithPlaceholders(getSubject(), placeholders),
+                subject: environmentPrefix + await this.renderTemplateWithPlaceholders(getSubject(), placeholders),
                 body: await this.renderTemplateWithPlaceholders(await getBody(), placeholders),
                 cc: getField(getCc(), this.mailerRequestDto?.cc),
                 cco: getField(getCco(), this.mailerRequestDto?.cco)
             };
+            return notificationDetails;
         } catch (error: any) {
             if (error instanceof CustomError) {
                 throw error;
@@ -88,13 +89,12 @@ export class MailerBuilderNotificationDatasourceImpl implements MailerBuilderNot
                     studentUuid: 'asdasda',
                     mailerNotificationId: this.mailerNotificationEntity?.id,
                     subject: emailNotification.subject,
-                    to: emailNotification.to,
-                    cc: emailNotification.cc,
-                    cco: emailNotification.cco,
+                    to: emailNotification.to.join(', '),
+                    cc: emailNotification.cc?.join(', '),
+                    cco: emailNotification.cco?.join(', '),
                     body: emailNotification.body,
                     status: MailerNotificationStatus.PENDING
-                });
-
+                });              
                 if (error) {
                     throw CustomError.internalServer('Error creating mailer notification history');
                 }
