@@ -47,13 +47,12 @@ export default class EducationalSynchroDatasourceImpl implements EducationalSync
                     idnumber: group.groupIdNumber,
                     description: group.groupIdNumber,
                 });
-                console.log('Created Moodle Group:', moodleGroup);
                 return moodleGroup;
             })
+            console.log("moodleGroups", moodleGroups);
             
             const createdGroups = await new ExternalEducationalSyncApiRepository().createGroups(moodleGroups, institution)        
-            console.log('esto si se creo',createdGroups.data)   
-            
+                        
             return createdGroups.data.map((group:any) => GroupElementEduSyncDto.fromExternal(group))
         } catch (error) {
             CustomError.throwAnError(error)

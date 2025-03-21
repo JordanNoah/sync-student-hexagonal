@@ -52,13 +52,15 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                         
                             const eduGroups = await new EducationalSynchroDatasourceImpl().getGroups(basicGroups)
                         
+                            console.log(eduGroups);
+                            
                             if (eduGroups.missingGroups.length > 0) {
                                 const createGroups = await new EducationalSynchroDatasourceImpl().createGroups(eduGroups.missingGroups, institution, courseEduSynchro.existingCourses)
-                                console.log("grupos a crear: ",createGroups);
+                                //console.log("grupos a crear: ",createGroups);
                                 
                                 eduGroups.existGroups.push(...createGroups)
                             }
-                            console.log("grupo: ",eduGroups);
+                            //console.log("grupo: ",eduGroups);
                             
                             await new MoodleDatasourceImpl().assingGroups(eduGroups.existGroups, institution, student)
                         
@@ -241,18 +243,17 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
             const groupsToChech = coursesUuidDto.flatMap(
                 course => {
                     let arrayOfGroups = [
-                        new GroupCheckEduSyncDto(`lang.${inscription.lang.toLowerCase()}`,course.externalId),
-                        new GroupCheckEduSyncDto(`org.${institution.abbreviation.toLowerCase()}`,course.externalId),
-                        new GroupCheckEduSyncDto(`program.${programCourse.shortName!.split("-")[0]!.toLowerCase()}`,course.externalId),
+                        new GroupCheckEduSyncDto(`lang.${inscription.lang.toLowerCase()}`,course.id),
+                        new GroupCheckEduSyncDto(`org.${institution.abbreviation.toLowerCase()}`,course.id),
+                        new GroupCheckEduSyncDto(`program.${programCourse.shortName!.split("-")[0]!.toLowerCase()}`,course.id),
                     ]
 
                     const coursedata = listOfCourses.find(courseuuid => courseuuid.uuid === course.uuid)
                     if (coursedata && coursedata.academicPeriod) {
                         arrayOfGroups.push(
-                            new GroupCheckEduSyncDto(`term.${coursedata.academicPeriod}`,course.externalId)
+                            new GroupCheckEduSyncDto(`term.${coursedata.academicPeriod}`,course.id)
                         )
                     }
-                    console.log(arrayOfGroups);
                     
                     return arrayOfGroups
                 }
