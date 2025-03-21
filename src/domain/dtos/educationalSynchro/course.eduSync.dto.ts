@@ -55,7 +55,7 @@ export class CoursesUuidDto {
             deleted_at,
             uuid
         } = object;
-
+        
         return [undefined, new CoursesUuidDto(
             id,
             external_id,

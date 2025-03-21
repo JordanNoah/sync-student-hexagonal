@@ -46,21 +46,19 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                             }
                         
                             await new MoodleDatasourceImpl().courseEnrolments(courseEduSynchro.existingCourses, courseUuid, student, institution)
-                            console.log(courseEduSynchro.existingCourses, academicRecord.inscription, institution, courseUuid, programCourse);
+ 
                             
                             const basicGroups = this.getListBasicGroups(courseEduSynchro.existingCourses, academicRecord.inscription, institution, courseUuid, programCourse)
                         
                             const eduGroups = await new EducationalSynchroDatasourceImpl().getGroups(basicGroups)
-                        
-                            console.log(eduGroups);
+
                             
                             if (eduGroups.missingGroups.length > 0) {
                                 const createGroups = await new EducationalSynchroDatasourceImpl().createGroups(eduGroups.missingGroups, institution, courseEduSynchro.existingCourses)
-                                //console.log("grupos a crear: ",createGroups);
+
                                 
                                 eduGroups.existGroups.push(...createGroups)
                             }
-                            //console.log("grupo: ",eduGroups);
                             
                             await new MoodleDatasourceImpl().assingGroups(eduGroups.existGroups, institution, student)
                         
@@ -112,14 +110,10 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
     }
 
     async assingGroups(groupElementEduSyncDto: GroupElementEduSyncDto[], institution: InstitutionEntity, student: StudentToMoodleDto): Promise<void> {
-        console.log('data',groupElementEduSyncDto);
         try {            
-            const groupsToAssign = groupElementEduSyncDto.map(group => {
-                console.log(group);               
+            const groupsToAssign = groupElementEduSyncDto.map(group => {          
                 return new AssignGroupMoodleDto(group.externalId, student.id!)
             })
-
-            console.log('final',groupsToAssign);
             
             await new ExternalMoodleApiRepository(institution).assignUserToGroup(groupsToAssign);
             

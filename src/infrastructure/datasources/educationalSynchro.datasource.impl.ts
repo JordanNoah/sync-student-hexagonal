@@ -49,11 +49,17 @@ export default class EducationalSynchroDatasourceImpl implements EducationalSync
                 });
                 return moodleGroup;
             })
-            console.log("moodleGroups", moodleGroups);
             
             const createdGroups = await new ExternalEducationalSyncApiRepository().createGroups(moodleGroups, institution)        
-                        
-            return createdGroups.data.map((group:any) => GroupElementEduSyncDto.fromExternal(group))
+            const result: GroupElementEduSyncDto[] = [];
+            for (const group of createdGroups.data) {
+                const [error, groupElement] = GroupElementEduSyncDto.fromExternal(group);
+                if (error) {
+                    throw CustomError.internalServer(error)
+                }
+                result.push(groupElement!);
+            }
+            return result;
         } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);
