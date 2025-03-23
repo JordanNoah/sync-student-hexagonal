@@ -159,7 +159,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
             }
 
             if (inscription.processed) {
-                //--const student = await this.syncStudent(inscription.studentUuid, institution)
+                const student = await this.syncStudent(inscription.studentUuid, institution)
                 //revisar si es una seleccion academica compartida
                 const studentInscriptions = await new InscriptionDatasourceImpl().getSharedInscriptions(inscription.studentUuid, inscription.id)
 
@@ -175,7 +175,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                 if (!findSharedCourse) {
                     const courses = await new EducationalSynchroDatasourceImpl().getCourses([new CourseUuid('course',academicSelectionEntity.academicElementUuid)], institution)
                     if (courses.existingCourses.length > 0) {
-                        //--await this.unenrollStudent(student, institution, courses.existingCourses)
+                        await this.unenrollStudent(student, institution, courses.existingCourses)
                     }
 
                     if (courses.missingCourse.length > 0){
