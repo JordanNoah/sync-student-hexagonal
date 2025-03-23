@@ -26,6 +26,7 @@ export default class InstitutionDatasourceImpl implements InstitutionDatasource 
             let institutionEntity: InstitutionEntity | null = null
             for (const degree of degrees) {                
                 const institution = await this.getByAbbreviation(degree.instituionComing);
+                
                 if (institution){
                     degree.institution = institution;
                     if (institution.abbreviation.toUpperCase() === "UNIB") {
@@ -37,9 +38,12 @@ export default class InstitutionDatasourceImpl implements InstitutionDatasource 
                         if (parent) {
                             institutionEntity = parent;
                         }
+                    }else{
+                        institutionEntity = institution;
                     }
                 }
             }
+            
             return institutionEntity;
         } catch (error) {
             CustomError.throwAnError(error)

@@ -6,6 +6,7 @@ import { AcademicSelectionSequelize } from "../database/models";
 import { addMinutes } from "@/shared/utils";
 import { Op } from "sequelize";
 import ProgramOfferedDatasourceImpl from "./programOffered.datasource.impl";
+import { CoursesUuidDto } from "@/domain/dtos/educationalSynchro/course.eduSync.dto";
 
 export default class AcademicSelectionDatasourceImpl implements AcademicSelectionDatasource {
     async createUpdate(academicSelectionEventDto: AcademicSelectionEventDto): Promise<AcademicSelectionEntity> {
@@ -125,6 +126,15 @@ export default class AcademicSelectionDatasourceImpl implements AcademicSelectio
                 }
             })
             return academicSelectionEntity
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async sharedAcademicSelection(course: CoursesUuidDto): Promise<AcademicSelectionEntity | null> {
+        try {
+            throw new Error("Method not implemented.");
         } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);

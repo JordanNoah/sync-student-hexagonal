@@ -155,7 +155,7 @@ export default class InscriptionDatasourceImpl implements InscriptionDatasource 
                         [Op.lt]: new Date(),
                     },
                     processed: false
-                }
+                },
             })
             
             for (const inscription of inscriptions) {
@@ -197,6 +197,37 @@ export default class InscriptionDatasourceImpl implements InscriptionDatasource 
             await this.updateByEntity(academicRecordEntity.inscription)
 
             return academicRecordEntity
+        } catch (error) {
+            CustomError.throwAnError(error)
+            return Promise.reject(error);
+        }
+    }
+
+    async getSharedInscriptions(studentUuid: string, initialInscriptionId: number): Promise<InscriptionEntity[]> {
+        try {
+            const inscriptions = await InscriptionSequelize.findAll({
+                where: {
+                    studentUuid: studentUuid,
+                    id: {
+                        [Op.notIn]: [initialInscriptionId]
+                    }
+                }
+            })
+            if (inscriptions.length === 0) return []
+            for (const element of inscriptions) {
+                element.degrees = await new DegreeDatasourceImpl().getByInscriptionUuid(element.uuid)
+                if (element.degrees.length == 0) {
+                    continue
+                }
+                element.degrees = element.degrees
+                element.enrollments = await new EnrollmentDatasourceImpl().getByInscriptionUuid(element.uuid)
+                if (element.enrollments.length > 0) {
+                    for (const enrollment of element.enrollments) {
+                        enrollment.academicSelections = await new AcademicSelectionDatasourceImpl().getByEnrollmentUuid(enrollment.uuid)
+                    }
+                }
+            }
+            return inscriptions.map(inscription => InscriptionEntity.fromRow(inscription))
         } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);

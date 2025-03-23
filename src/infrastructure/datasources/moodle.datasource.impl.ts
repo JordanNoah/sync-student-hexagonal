@@ -143,9 +143,9 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
         }
     }
 
-    async discardAcademicSelection(AcademicSelectionEntity: AcademicSelectionEntity): Promise<void> {
+    async discardAcademicSelection(academicSelectionEntity: AcademicSelectionEntity): Promise<void> {
         try {
-            const enrollment = await new EnrollmentDatasourceImpl().getByUuid(AcademicSelectionEntity.enrollmentUuid)
+            const enrollment = await new EnrollmentDatasourceImpl().getByUuid(academicSelectionEntity.enrollmentUuid)
             if(!enrollment){
                 throw CustomError.internalServer("Enrollment not found")
             }
@@ -158,21 +158,37 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
             if(degrees.length === 0){
                 throw CustomError.internalServer("Degree not found")
             }
-
+            
             const institution = await new InstitutionDatasourceImpl().getByDegrees(degrees)
             if(!institution){
                 throw CustomError.internalServer("Institution not found")
             }
 
             if (inscription.processed) {
-                const student = await this.syncStudent(inscription.studentUuid, institution)
-                const courses = await new EducationalSynchroDatasourceImpl().getCourses([new CourseUuid('course',AcademicSelectionEntity.academicElementUuid)], institution)
-                if (courses.existingCourses.length > 0) {
-                    await this.unenrollStudent(student, institution, courses.existingCourses)
-                }
+                //--const student = await this.syncStudent(inscription.studentUuid, institution)
+                //revisar si es una seleccion academica compartida
+                const studentInscriptions = await new InscriptionDatasourceImpl().getSharedInscriptions(inscription.studentUuid, inscription.id)
 
-                if (courses.missingCourse.length > 0){
-                    //TO DO: enviar correo de curso faltante
+                const findSharedCourse = studentInscriptions.find((inscription) => {
+                    return inscription.enrollments?.find((enrollment) => {
+                        return enrollment.academicSelections?.find((academicSelection) => {
+                            return academicSelection.academicElementUuid === academicSelectionEntity.academicElementUuid
+                        })
+                    })
+
+                })
+
+                if (!findSharedCourse) {
+                    const courses = await new EducationalSynchroDatasourceImpl().getCourses([new CourseUuid('course',academicSelectionEntity.academicElementUuid)], institution)
+                    if (courses.existingCourses.length > 0) {
+                        //--await this.unenrollStudent(student, institution, courses.existingCourses)
+                    }
+
+                    if (courses.missingCourse.length > 0){
+                        //TO DO: enviar correo de curso faltante
+                    }
+                }else{
+                    console.log(`Shared course found ${academicSelectionEntity.academicElementUuid}`);
                 }
                 
             }
