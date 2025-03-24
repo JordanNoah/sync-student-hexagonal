@@ -18,6 +18,9 @@ import DegreeEntity from "@/domain/entity/degree.entity";
 import InstitutionDatasourceImpl from "./institution.datasource.impl";
 import CronProcessorDatasourceImpl from "./cronProcessor.datasource.impl";
 import EducationalSynchroDatasourceImpl from "./educationalSynchro.datasource.impl";
+import StudentToMoodleDto from "@/domain/dtos/moodle/student.moodle.dto";
+import AcademicRecordEntity from "@/domain/entity/academicRecord.entity";
+import StudentSynchronizedDto from "@/domain/dtos/rabbitmq/studentSynchronized.dto";
 
 export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDatasource {
     async InscriptioRegisteredProcessor(message: RabbitMQMessageDto): Promise<void> {
@@ -176,7 +179,6 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
     }
-
     async DegreeRegistered(message: RabbitMQMessageDto): Promise<void> {
         try {
             const content = JSON.parse(message.content.toString());
@@ -225,7 +227,6 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
     }
-
     async DegreeWithdrawn(message: RabbitMQMessageDto): Promise<void> {
         try {
             const content = JSON.parse(message.content.toString());
@@ -377,7 +378,6 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
     }
-
     async ProgramChanged(message: RabbitMQMessageDto): Promise<void> {
         try {
             const content = JSON.parse(message.content.toString());
@@ -411,7 +411,6 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }
     }
-
     async ProgramEndDateEstablished(message: RabbitMQMessageDto): Promise<void> {
         try {
             const content = JSON.parse(message.content.toString());
@@ -483,6 +482,18 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             inscriptionEntity.registeredAt = inscriptionDto!.inscription.newDate!;
             inscriptionEntity.processed = false;
             await new InscriptionDatasourceImpl().updateByEntity(inscriptionEntity);
+        } catch (error) {
+            return CustomError.throwAnError(error) ?? Promise.resolve();
+        }
+    }
+    async StudentSynchronized(academicRecord: AcademicRecordEntity): Promise<void> {
+        try {
+            const [error, eventDto] = StudentSynchronizedDto.create(academicRecord);
+                if (error) {
+                    throw CustomError.internalServer(error)
+                }
+                console.log('StudentSynchronized', eventDto?.inscription[0]);
+            
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }

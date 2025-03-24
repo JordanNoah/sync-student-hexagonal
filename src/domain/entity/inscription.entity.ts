@@ -1,6 +1,10 @@
 import { InscriptionSequelize } from "@/infrastructure/database/models";
 import EnrollmentEntity from "./enrollment.entity";
 import DegreeEntity from "./degree.entity";
+import InstitutionEntity from "./institution.entity";
+import StudentToMoodleDto from "../dtos/moodle/student.moodle.dto";
+import EnrollmentMoodleDto from "../dtos/moodle/enrollment.moodle.dto";
+import { GroupElementEduSyncDto } from "../dtos/educationalSynchro/groups.eduSync.dto";
 
 export default class InscriptionEntity {
     constructor(
@@ -25,7 +29,12 @@ export default class InscriptionEntity {
         public deletedAt: Date,
         public introductoryModule?: string,
         public enrollments?: EnrollmentEntity[],
-        public degrees?: DegreeEntity[]
+        public degrees?: DegreeEntity[],
+        public institution?: InstitutionEntity,
+        public groups?: string[],
+        public student?: StudentToMoodleDto,
+        public moodleEnrollments?: EnrollmentMoodleDto[],
+        public groupsMoodle?: GroupElementEduSyncDto[],
     ){}
 
     static fromRow(row: InscriptionSequelize): InscriptionEntity {

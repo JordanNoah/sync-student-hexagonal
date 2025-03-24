@@ -22,6 +22,7 @@ import { getOnlyYearAndMonth } from "@/shared/utils";
 import GroupCheckEduSyncDto from "@/domain/dtos/educationalSynchro/groupCheck.eduSync.dto";
 import InscriptionEntity from "@/domain/entity/inscription.entity";
 import ProgramOfferedDatasourceImpl from "./programOffered.datasource.impl";
+import RabbitProcessorDatasourceImpl from "./rabbitProcessor.datasource.impl";
 
 export default class MoodleDatasourceImpl implements MoodleDatasource {
     async enrollFromAcademicRecord(academicRecord: AcademicRecordEntity): Promise<void> {
@@ -30,7 +31,8 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                 if (institution) {
                     const courseUuid = await this.getListOfCourses(academicRecord)
                     const courseEduSynchro = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid, institution)
-
+                    console.log("Courses found: ", courseEduSynchro);
+                    
                     if (courseEduSynchro.missingCourse.length > 0) {
                         //todo: correo electronico avisando la falta de cursos
                     }
@@ -39,7 +41,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                         const programCourse = courseEduSynchro.existingCourses.find(course => course.uuid === academicRecord.inscription.programVersionUuid)
                         if (programCourse) {
                             const student = await new MoodleDatasourceImpl().syncStudent(academicRecord.inscription.studentUuid!, institution)
-
+                            
                             if(!student.isCreated && (academicRecord.inscription.enrollments && academicRecord.inscription.enrollments.length > 0)) {
                                 // todo masive unenroll
                                 await new MoodleDatasourceImpl().unenrollStudent(student, institution, courseEduSynchro.existingCourses)
@@ -55,13 +57,12 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                             
                             if (eduGroups.missingGroups.length > 0) {
                                 const createGroups = await new EducationalSynchroDatasourceImpl().createGroups(eduGroups.missingGroups, institution, courseEduSynchro.existingCourses)
-
                                 
                                 eduGroups.existGroups.push(...createGroups)
                             }
                             
                             await new MoodleDatasourceImpl().assingGroups(eduGroups.existGroups, institution, student)
-                        
+                            await new RabbitProcessorDatasourceImpl().StudentSynchronized(academicRecord)
                             //actualizar todo a hecho en db
                             await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
                         }

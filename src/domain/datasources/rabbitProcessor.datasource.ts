@@ -1,4 +1,6 @@
 import {RabbitMQMessageDto} from 'rabbitmq-resilience'
+import AcademicRecordEntity from '../entity/academicRecord.entity';
+import StudentToMoodleDto from '../dtos/moodle/student.moodle.dto';
 export default abstract class RabbitProcessorDatasource {
     abstract InscriptioRegisteredProcessor(message:RabbitMQMessageDto): Promise<void>;
     abstract RegistrationDateEstablished(message:RabbitMQMessageDto): Promise<void>;
@@ -17,4 +19,6 @@ export default abstract class RabbitProcessorDatasource {
     abstract DegreeDeactivated(message:RabbitMQMessageDto): Promise<void>;
     abstract DegreeRegistered(message:RabbitMQMessageDto): Promise<void>;
     abstract ProgramOffered(message:RabbitMQMessageDto): Promise<void>;
+    // expose to the world method
+    abstract StudentSynchronized(academicRecord: AcademicRecordEntity): Promise<void>;
 }

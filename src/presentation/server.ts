@@ -7,6 +7,7 @@ import { serve } from "@hono/node-server";
 import { RabbitMQR } from "@/infrastructure/rabbitmq";
 import AppRoutes from "./routes";
 import { syncInscriptions } from "@/infrastructure/cron";
+import RabbitProcessorDatasourceImpl from "@/infrastructure/datasources/rabbitProcessor.datasource.impl";
 
 interface Options {
     port?: number
