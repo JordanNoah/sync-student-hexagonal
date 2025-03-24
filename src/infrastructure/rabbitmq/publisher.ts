@@ -3,6 +3,7 @@ import {RabbitMQR} from './index'
 import StudentSynchronizedDto from '@/domain/dtos/rabbitmq/studentSynchronized.dto';
 import { MessageFieldsDto, MessagePropertiesDto } from 'rabbitmq-resilience/dist/domain/dtos/eventManager';
 import appConfig from '@/shared/appConfig';
+import StudentEnrolledDto from '@/domain/dtos/rabbitmq/studentEnrolled.dto';
 
 export default class RabbitMqPublisher {
     public publishStudentSynchronized(studentSynchronizedDto:StudentSynchronizedDto) {
@@ -15,6 +16,20 @@ export default class RabbitMqPublisher {
                 appConfig.RABBIT_ROUTING_KEY,
             ),
             this.basicHeaders('teaching-action.students-academic-synchronization.student_synchronized')
+        )
+        this.publishMessage(message)
+    }
+
+    public publishStudentEnrolled(StudentEnrolledDto:StudentEnrolledDto) {
+        const message = new RabbitMQMessageDto(
+            Buffer.from(JSON.stringify(StudentEnrolledDto)),
+            new MessageFieldsDto(
+                0,
+                false,
+                appConfig.RABBIT_EXCHANGE,
+                appConfig.RABBIT_ROUTING_KEY,
+            ),
+            this.basicHeaders('teaching-action.students-academic-synchronization.student_enrolled')
         )
         this.publishMessage(message)
     }

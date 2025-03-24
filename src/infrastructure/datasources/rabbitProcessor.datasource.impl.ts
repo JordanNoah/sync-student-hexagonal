@@ -22,6 +22,7 @@ import StudentToMoodleDto from "@/domain/dtos/moodle/student.moodle.dto";
 import AcademicRecordEntity from "@/domain/entity/academicRecord.entity";
 import StudentSynchronizedDto from "@/domain/dtos/rabbitmq/studentSynchronized.dto";
 import RabbitMqPublisher from "../rabbitmq/publisher";
+import StudentEnrolledDto from "@/domain/dtos/rabbitmq/studentEnrolled.dto";
 
 export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDatasource {
     async InscriptioRegisteredProcessor(message: RabbitMQMessageDto): Promise<void> {
@@ -495,6 +496,19 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             }
             
             await new RabbitMqPublisher().publishStudentSynchronized(eventDto!)
+        } catch (error) {
+            return CustomError.throwAnError(error) ?? Promise.resolve();
+        }
+    }
+
+    async StudentEnrolled(academicRecord: AcademicRecordEntity): Promise<void> {
+        try {            
+            const [error, eventDto] = StudentEnrolledDto.create(academicRecord);
+            if (error) {
+                throw CustomError.internalServer(error)
+            }
+            
+            await new RabbitMqPublisher().publishStudentEnrolled(eventDto!)
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();
         }

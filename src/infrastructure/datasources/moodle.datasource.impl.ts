@@ -67,6 +67,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                             academicRecord.inscription.groupsMoodle = eduGroups.existGroups
                             academicRecord.inscription.institution = institution
                             await new RabbitProcessorDatasourceImpl().StudentSynchronized(academicRecord)
+                            await new RabbitProcessorDatasourceImpl().StudentEnrolled(academicRecord)
                             //actualizar todo a hecho en db
                             //await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
                         }
