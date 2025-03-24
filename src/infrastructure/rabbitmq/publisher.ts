@@ -34,7 +34,7 @@ export default class RabbitMqPublisher {
             undefined,
             undefined,
             undefined,
-            undefined,
+            crypto.randomUUID(),
             messageType,
             undefined,
             appConfig.APPID,
