@@ -86,7 +86,7 @@ export class StoredDataDto {
     static create(object: InscriptionEntity): [string?, StoredDataDto?] {
         const user: UserDataDto[] = [];
         const enrollments: EnrollmentDto[] = [];
-
+        
         const [err, userDto] = UserDataDto.create(object.student!);
         if (err) return [err, undefined];
         user.push(userDto!);
@@ -206,7 +206,7 @@ export default class StudentSynchronizedDto {
     ) { }
 
     static create(object: { [key: string]: any }): [string?, StudentSynchronizedDto?] {
-        const [error, inscriptionRabbit] = InscriptionDto.create(object.record.inscription)
+        const [error, inscriptionRabbit] = InscriptionDto.create(object.inscription)
         if (error) return [error, undefined]
 
         return [undefined, new StudentSynchronizedDto(

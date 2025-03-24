@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 export default {
+    APPID: process.env.APPID ?? 'teaching-action.sync-student',
     PORT: Number(process.env.PORT) ?? 3000,
     DB_HOST: process.env.DB_HOST ?? 'localhost',
     DB_PORT: Number(process.env.DB_PORT) ?? 3000,

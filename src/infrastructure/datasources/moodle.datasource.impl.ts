@@ -23,6 +23,9 @@ import GroupCheckEduSyncDto from "@/domain/dtos/educationalSynchro/groupCheck.ed
 import InscriptionEntity from "@/domain/entity/inscription.entity";
 import ProgramOfferedDatasourceImpl from "./programOffered.datasource.impl";
 import RabbitProcessorDatasourceImpl from "./rabbitProcessor.datasource.impl";
+import UserSgDto from "@/domain/dtos/sg/user.sg.dto";
+import EmailSgDto from "@/domain/dtos/sg/email.sg.dto";
+import CredentialDto from "@/domain/dtos/sg/credential.dto";
 
 export default class MoodleDatasourceImpl implements MoodleDatasource {
     async enrollFromAcademicRecord(academicRecord: AcademicRecordEntity): Promise<void> {
@@ -30,24 +33,23 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
             const institution = await new InstitutionDatasourceImpl().getByDegrees(academicRecord.inscription.degrees!)
                 if (institution) {
                     const courseUuid = await this.getListOfCourses(academicRecord)
-                    const courseEduSynchro = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid, institution)
-                    console.log("Courses found: ", courseEduSynchro);
+                    const courseEduSynchro = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid, institution)                   
                     
                     if (courseEduSynchro.missingCourse.length > 0) {
                         //todo: correo electronico avisando la falta de cursos
                     }
-
+                    EnrollmentMoodleDto
                     if (courseEduSynchro.existingCourses.length > 0) {
                         const programCourse = courseEduSynchro.existingCourses.find(course => course.uuid === academicRecord.inscription.programVersionUuid)
                         if (programCourse) {
-                            const student = await new MoodleDatasourceImpl().syncStudent(academicRecord.inscription.studentUuid!, institution)
-                            
+                            academicRecord.inscription.student = await new MoodleDatasourceImpl().syncStudent(academicRecord.inscription.studentUuid!, institution)
+                            const student = academicRecord.inscription.student
                             if(!student.isCreated && (academicRecord.inscription.enrollments && academicRecord.inscription.enrollments.length > 0)) {
                                 // todo masive unenroll
                                 await new MoodleDatasourceImpl().unenrollStudent(student, institution, courseEduSynchro.existingCourses)
                             }
                         
-                            await new MoodleDatasourceImpl().courseEnrolments(courseEduSynchro.existingCourses, courseUuid, student, institution)
+                            academicRecord.inscription.moodleEnrollments = await new MoodleDatasourceImpl().courseEnrolments(courseEduSynchro.existingCourses, courseUuid, student, institution)
  
                             
                             const basicGroups = this.getListBasicGroups(courseEduSynchro.existingCourses, academicRecord.inscription, institution, courseUuid, programCourse)
@@ -62,9 +64,11 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                             }
                             
                             await new MoodleDatasourceImpl().assingGroups(eduGroups.existGroups, institution, student)
+                            academicRecord.inscription.groupsMoodle = eduGroups.existGroups
+                            academicRecord.inscription.institution = institution
                             await new RabbitProcessorDatasourceImpl().StudentSynchronized(academicRecord)
                             //actualizar todo a hecho en db
-                            await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
+                            //await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
                         }
                     }
                 }
@@ -78,8 +82,11 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
     async syncStudent(studentUuid: string, institution: InstitutionEntity): Promise<StudentToMoodleDto> {
         try {
             const sgStudent = await new SgDatasourceImpl().getStudent(studentUuid)
+            console.log(sgStudent);
+            
             const educationalSynchro = await new EducationalSynchroDatasourceImpl().getStudent(studentUuid, institution)
             const studentMoodle = StudentToMoodleDto.fromExternal(sgStudent, educationalSynchro)
+            
             if (!educationalSynchro) {
                 const moodleStudent = await new ExternalMoodleApiRepository(institution).createStudent(studentMoodle)
                 studentMoodle.id = moodleStudent.data[0].id
@@ -95,15 +102,15 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
         }
     }
 
-    async courseEnrolments(coursesUuidDto:CoursesUuidDto[], coursesUuid:CourseUuid[], student:StudentToMoodleDto, institution:InstitutionEntity): Promise<void> {
+    async courseEnrolments(coursesUuidDto:CoursesUuidDto[], coursesUuid:CourseUuid[], student:StudentToMoodleDto, institution:InstitutionEntity): Promise<EnrollmentMoodleDto[]> {
         try {
             const coursesToEnrol = coursesUuidDto.map(course => {
                 const courseData = coursesUuid.find(couseuuid => couseuuid.uuid === course.uuid)
                 return EnrollmentMoodleDto.fromCourseDto(course, student, courseData?.startDate, courseData?.endDate).toJSON()
-            })
+            }) as EnrollmentMoodleDto[]
 
             await new ExternalMoodleApiRepository(institution).enrollUser(coursesToEnrol)
-            
+            return coursesToEnrol
         } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);
