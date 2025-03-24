@@ -72,7 +72,7 @@ class Campus {
         return [undefined, new Campus(
             campus.uuid,
             campus.name,
-            `EVA-${campus.abbreviation}`,
+            `EVA_${campus.abbreviation}`,
             campus.modality,
             campus.domain,
             campus.website,
