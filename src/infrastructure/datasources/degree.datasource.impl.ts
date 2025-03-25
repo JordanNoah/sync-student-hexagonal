@@ -3,6 +3,7 @@ import DegreeEventDto from "@/domain/dtos/degree/degree.event.dto";
 import DegreeEntity from "@/domain/entity/degree.entity";
 import { CustomError } from "@/domain/errors/custom.error";
 import { DegreeSequelize } from "../database/models";
+import InstitutionDatasourceImpl from "./institution.datasource.impl";
 
 export default class DegreeDatasourceImpl implements DegreeDatasource {
     async createUpdate(degreeEventDto: DegreeEventDto): Promise<DegreeEntity> {
@@ -65,11 +66,17 @@ export default class DegreeDatasourceImpl implements DegreeDatasource {
 
     async getByInscriptionUuid(inscriptionUuid: string): Promise<DegreeEntity[]> {
         try {
-            const degrees = await DegreeSequelize.findAll({
+            let degrees = await DegreeSequelize.findAll({
                 where: {
                     inscriptionUuid
                 }
             })
+
+            for (const degree of degrees) {
+                degree.institution = await new InstitutionDatasourceImpl().getByAbbreviation(degree.instituionComing) ?? undefined
+            }
+
+            degrees = degrees.sort((a, b) => a.institution!.importance! - b.institution!.importance!);
 
             return degrees.map(degree => DegreeEntity.fromRow(degree))
         } catch (error) {

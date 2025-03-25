@@ -19,6 +19,7 @@ const institutionSeederData = [
         }),
         active: true,
         parent: null,
+        importance: 5,
         created_at: new Date(),
         updated_at: new Date()
     },
@@ -42,6 +43,7 @@ const institutionSeederData = [
         }),
         active: true,
         parent: 1,
+        importance: 2,
         created_at: new Date(),
         updated_at: new Date()
     },
@@ -62,6 +64,7 @@ const institutionSeederData = [
         }),
         active: false,
         parent: 1,
+        importance: 1,
         created_at: new Date(),
         updated_at: new Date()
     },
@@ -69,7 +72,7 @@ const institutionSeederData = [
         uuid: "4fc725b9-e2b6-54dc-ac5d-ba9e5cdba862",
         name: "UNINI",
         fullname: "Universidad Internacional Iberoamericana",
-        abbreviation: "UNINIMX",
+        abbreviation: "UNINI-MX",
         domain: "unini.edu.mx",
         token: "87dce7128c39",
         website: "https://campus.funiber.org",
@@ -82,6 +85,7 @@ const institutionSeederData = [
         }),
         active: false,
         parent: 1,
+        importance: 4,
         created_at: new Date(),
         updated_at: new Date()
     },
@@ -102,6 +106,7 @@ const institutionSeederData = [
         }),
         active: false,
         parent: 1,
+        importance: 3,
         created_at: new Date(),
         updated_at: new Date()
     },
@@ -121,6 +126,7 @@ const institutionSeederData = [
         }),
         active: false,
         parent: 1,
+        importance: 7,
         created_at: new Date(),
         updated_at: new Date()
     },
@@ -140,6 +146,7 @@ const institutionSeederData = [
         }),
         active: false,
         parent: 1,
+        importance: 6,
         created_at: new Date(),
         updated_at: new Date()
     }

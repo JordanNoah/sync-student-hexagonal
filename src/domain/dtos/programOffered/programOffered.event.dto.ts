@@ -12,6 +12,7 @@ export default class ProgramOfferedEventDto {
 
     static create(object: { [key: string]: any }): [string?, ProgramOfferedEventDto?] {
         const {uuid, fired_at, program, offers} = object
+        
         const messageErrorComplement = 'missing in programOffered structure'
         if (!uuid) return [`uuid ${messageErrorComplement}`, undefined]
         if (!fired_at) return [`fired_at ${messageErrorComplement}`, undefined]

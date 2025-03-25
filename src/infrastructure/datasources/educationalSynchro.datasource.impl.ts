@@ -13,7 +13,8 @@ export default class EducationalSynchroDatasourceImpl implements EducationalSync
     async getStudent(uuid: string, institution: InstitutionEntity): Promise<StudentEntity | null> {
         try {
             const response = await new ExternalEducationalSyncApiRepository().getStudentByUuidAndInstitutionAbbr(uuid, institution)
-            const student = response.data            
+            const student = response.data   
+                     
             if (!student) return null
 
             return StudentEntity.create(student)

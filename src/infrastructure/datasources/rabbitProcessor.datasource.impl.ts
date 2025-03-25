@@ -159,7 +159,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
                             
                                 await new MoodleDatasourceImpl().courseEnrolments(courseUuidDto.existingCourses, courseUuid, student, newInstitution)
                             
-                                const basicGroups = new MoodleDatasourceImpl().getListBasicGroups(courseUuidDto.existingCourses, academicRecord.inscription, newInstitution, courseUuid, programCourse)
+                                const basicGroups = new MoodleDatasourceImpl().getListBasicGroups(courseUuidDto.existingCourses, academicRecord.inscription, academicRecord.inscription.degrees!, courseUuid, programCourse)
                             
                                 const eduGroups = await new EducationalSynchroDatasourceImpl().getGroups(basicGroups)
                             

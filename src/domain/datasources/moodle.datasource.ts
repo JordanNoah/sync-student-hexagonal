@@ -6,6 +6,7 @@ import EnrollmentMoodleDto from "../dtos/moodle/enrollment.moodle.dto";
 import StudentToMoodleDto from "../dtos/moodle/student.moodle.dto";
 import AcademicRecordEntity from "../entity/academicRecord.entity";
 import AcademicSelectionEntity from "../entity/academicSelection.entity";
+import DegreeEntity from "../entity/degree.entity";
 import InscriptionEntity from "../entity/inscription.entity";
 import InstitutionEntity from "../entity/institution.entity";
 
@@ -18,5 +19,5 @@ export default abstract class MoodleDatasource {
     abstract enrollFromAcademicRecord(academicRecord: AcademicRecordEntity): Promise<void>;
     abstract getListOfCourses(academicRecord:AcademicRecordEntity, institution:InstitutionEntity): Promise<CourseUuid[]>
     abstract getAcademicPeriodString(academicSelection:AcademicSelectionEntity): string | undefined
-    abstract getListBasicGroups(coursesUuidDto:CoursesUuidDto[], inscription:InscriptionEntity, institution:InstitutionEntity, listOfCourses: CourseUuid[], programCourse: CoursesUuidDto): GroupCheckEduSyncDto[]
+    abstract getListBasicGroups(coursesUuidDto:CoursesUuidDto[], inscription:InscriptionEntity, degrees: DegreeEntity[], listOfCourses: CourseUuid[], programCourse: CoursesUuidDto): GroupCheckEduSyncDto[]
 }

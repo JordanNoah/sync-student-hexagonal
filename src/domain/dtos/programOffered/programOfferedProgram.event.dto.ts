@@ -6,11 +6,11 @@ export default class ProgramOfferedProgramEventDto {
     ){}
 
     static create(object: { [key: string]: any }): [string?, ProgramOfferedProgramEventDto?] {
-        const {uuid, abbreviation, version} = object
+        const {uuid, abbr, version} = object
         const messageErrorComplement = 'missing in programOfferedProgram structure'
         if (!uuid) return [`uuid ${messageErrorComplement}`, undefined]
-        if (!abbreviation) return [`abbreviation ${messageErrorComplement}`, undefined]
+        if (!abbr) return [`abbreviation ${messageErrorComplement}`, undefined]
 
-        return [undefined, new ProgramOfferedProgramEventDto(uuid, version, abbreviation)]
+        return [undefined, new ProgramOfferedProgramEventDto(uuid, version, abbr)]
     }
 }

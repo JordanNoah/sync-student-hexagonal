@@ -6,24 +6,30 @@ export default class ProgramOfferedOffertEventDto {
         public uuid: string,
         public academicPeriod: ProgramOfferedAcademicPeriodEventDto,
         public startDate: Date,
-        public endDate: Date,
+        public endDate: Date | null,
         public academicElement: ProgramOfferedAcademicElementEventDto
     ){}
 
     static create(object: { [key: string]: any }): [string?, ProgramOfferedOffertEventDto?] {
-        const {uuid, fired_at, program, offers} = object
+        const {uuid, academic_period, start_date, end_date, academic_element} = object
+        
         const messageErrorComplement = 'missing in programOfferedOffert structure'
         if (!uuid) return [`uuid ${messageErrorComplement}`, undefined]
-        if (!fired_at) return [`fired_at ${messageErrorComplement}`, undefined]
-        if (!program) return [`program ${messageErrorComplement}`, undefined]
-        if (!offers) return [`offers ${messageErrorComplement}`, undefined]
+        if (!academic_period) return [`academic_period ${messageErrorComplement}`, undefined]
+        if (!start_date) return [`start_date ${messageErrorComplement}`, undefined]
+        if (!academic_element) return [`academic_element ${messageErrorComplement}`, undefined]
 
-        const [error, academicProgramDto] = ProgramOfferedAcademicPeriodEventDto.create(program)
+        const [error, academicProgramDto] = ProgramOfferedAcademicPeriodEventDto.create(academic_period)
         if (error) return [error, undefined]
 
-        const [errorAcademicElement,academicElementDto] = ProgramOfferedAcademicElementEventDto.create(offers)
+        const [errorAcademicElement,academicElementDto] = ProgramOfferedAcademicElementEventDto.create(academic_element)
         if (errorAcademicElement) return [errorAcademicElement, undefined]
 
-        return [undefined, new ProgramOfferedOffertEventDto(uuid, academicProgramDto!, new Date(fired_at), new Date(fired_at), academicElementDto!)]
+        return [undefined, new ProgramOfferedOffertEventDto(
+            uuid, 
+            academicProgramDto!, 
+            new Date(start_date),
+            end_date ? new Date(end_date) : null,
+            academicElementDto!)]
     }
 }

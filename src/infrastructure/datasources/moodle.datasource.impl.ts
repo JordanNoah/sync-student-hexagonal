@@ -26,11 +26,14 @@ import RabbitProcessorDatasourceImpl from "./rabbitProcessor.datasource.impl";
 import UserSgDto from "@/domain/dtos/sg/user.sg.dto";
 import EmailSgDto from "@/domain/dtos/sg/email.sg.dto";
 import CredentialDto from "@/domain/dtos/sg/credential.dto";
+import DegreeEntity from "@/domain/entity/degree.entity";
 
 export default class MoodleDatasourceImpl implements MoodleDatasource {
     async enrollFromAcademicRecord(academicRecord: AcademicRecordEntity): Promise<void> {
         try {
             const institution = await new InstitutionDatasourceImpl().getByDegrees(academicRecord.inscription.degrees!)
+            console.log("Institution found: ", institution?.abbreviation);
+            
                 if (institution) {
                     const courseUuid = await this.getListOfCourses(academicRecord)
                     const courseEduSynchro = await new EducationalSynchroDatasourceImpl().getCourses(courseUuid, institution)                   
@@ -38,7 +41,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                     if (courseEduSynchro.missingCourse.length > 0) {
                         //todo: correo electronico avisando la falta de cursos
                     }
-                    EnrollmentMoodleDto
+                    
                     if (courseEduSynchro.existingCourses.length > 0) {
                         const programCourse = courseEduSynchro.existingCourses.find(course => course.uuid === academicRecord.inscription.programVersionUuid)
                         if (programCourse) {
@@ -52,7 +55,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                             academicRecord.inscription.moodleEnrollments = await new MoodleDatasourceImpl().courseEnrolments(courseEduSynchro.existingCourses, courseUuid, student, institution)
  
                             
-                            const basicGroups = this.getListBasicGroups(courseEduSynchro.existingCourses, academicRecord.inscription, institution, courseUuid, programCourse)
+                            const basicGroups = this.getListBasicGroups(courseEduSynchro.existingCourses, academicRecord.inscription, academicRecord.inscription.degrees!, courseUuid, programCourse)
                         
                             const eduGroups = await new EducationalSynchroDatasourceImpl().getGroups(basicGroups)
 
@@ -69,7 +72,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                             await new RabbitProcessorDatasourceImpl().StudentSynchronized(academicRecord)
                             await new RabbitProcessorDatasourceImpl().StudentEnrolled(academicRecord)
                             //actualizar todo a hecho en db
-                            //await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
+                            await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
                         }
                     }
                 }
@@ -83,7 +86,6 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
     async syncStudent(studentUuid: string, institution: InstitutionEntity): Promise<StudentToMoodleDto> {
         try {
             const sgStudent = await new SgDatasourceImpl().getStudent(studentUuid)
-            console.log(sgStudent);
             
             const educationalSynchro = await new EducationalSynchroDatasourceImpl().getStudent(studentUuid, institution)
             const studentMoodle = StudentToMoodleDto.fromExternal(sgStudent, educationalSynchro)
@@ -139,6 +141,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
             })            
 
             await new ExternalMoodleApiRepository(institution).unenrollUser(unenrollments)
+            
         } catch (error) {
             CustomError.throwAnError(error)
             return Promise.reject(error);
@@ -257,13 +260,13 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
         }
     }
 
-    getListBasicGroups(coursesUuidDto:CoursesUuidDto[], inscription:InscriptionEntity, institution:InstitutionEntity, listOfCourses: CourseUuid[], programCourse: CoursesUuidDto): GroupCheckEduSyncDto[] {
+    getListBasicGroups(coursesUuidDto:CoursesUuidDto[], inscription:InscriptionEntity, degrees:DegreeEntity[], listOfCourses: CourseUuid[], programCourse: CoursesUuidDto): GroupCheckEduSyncDto[] {
         try {
             const groupsToChech = coursesUuidDto.flatMap(
                 course => {
                     let arrayOfGroups = [
                         new GroupCheckEduSyncDto(`lang.${inscription.lang.toLowerCase()}`,course.id),
-                        new GroupCheckEduSyncDto(`org.${institution.abbreviation.toLowerCase()}`,course.id),
+                        new GroupCheckEduSyncDto(`org.${degrees[0].institution!.abbreviation.toLowerCase()}`,course.id),
                         new GroupCheckEduSyncDto(`program.${programCourse.shortName!.split("-")[0]!.toLowerCase()}`,course.id),
                     ]
 
