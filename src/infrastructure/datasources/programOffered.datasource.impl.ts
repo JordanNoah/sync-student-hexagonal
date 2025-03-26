@@ -15,15 +15,15 @@ export default class ProgramOfferedDatasourceImpl implements ProgramOfferedDatas
                 defaults: {
                     uuid: programOffered.uuid,
                     name: programOffered.academicPeriod.namePeriod,
-                    startDate: programOffered.startDate,
-                    endDate: programOffered.endDate
+                    startDate: programOffered.academicPeriod.startDate,
+                    endDate: programOffered.academicPeriod.startDate
                 }
             })
             if (!created) {
                 academicPeriod.uuid = programOffered.uuid
                 academicPeriod.name = programOffered.academicPeriod.namePeriod
-                academicPeriod.startDate = programOffered.startDate
-                academicPeriod.endDate = programOffered.endDate
+                academicPeriod.startDate = programOffered.academicPeriod.startDate
+                academicPeriod.endDate = programOffered.academicPeriod.endDate
             }
 
             return AcademicPeriodEntity.fromRow(academicPeriod)
