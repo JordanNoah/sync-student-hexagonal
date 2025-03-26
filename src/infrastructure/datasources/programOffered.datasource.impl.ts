@@ -3,9 +3,10 @@ import { CustomError } from "@/domain/errors/custom.error";
 import { AcademicPeriodSequelize } from "../database/models";
 import ProgramOfferedAcademicPeriodEventDto from "@/domain/dtos/programOffered/programOfferedAcademicPeriod.event.dto";
 import AcademicPeriodEntity from "@/domain/entity/academicPeriod.entity";
+import ProgramOfferedOffertEventDto from "@/domain/dtos/programOffered/programOfferedOffert.event.dto";
 
 export default class ProgramOfferedDatasourceImpl implements ProgramOfferedDatasource {
-    async createUpdate(programOffered: ProgramOfferedAcademicPeriodEventDto): Promise<AcademicPeriodEntity> {
+    async createUpdate(programOffered: ProgramOfferedOffertEventDto): Promise<AcademicPeriodEntity> {
         try {
             const [academicPeriod, created] = await AcademicPeriodSequelize.findOrCreate({
                 where: {
@@ -13,14 +14,14 @@ export default class ProgramOfferedDatasourceImpl implements ProgramOfferedDatas
                 },
                 defaults: {
                     uuid: programOffered.uuid,
-                    name: programOffered.namePeriod,
+                    name: programOffered.academicPeriod.namePeriod,
                     startDate: programOffered.startDate,
                     endDate: programOffered.endDate
                 }
             })
             if (!created) {
                 academicPeriod.uuid = programOffered.uuid
-                academicPeriod.name = programOffered.namePeriod
+                academicPeriod.name = programOffered.academicPeriod.namePeriod
                 academicPeriod.startDate = programOffered.startDate
                 academicPeriod.endDate = programOffered.endDate
             }

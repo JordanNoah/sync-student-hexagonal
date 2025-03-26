@@ -442,7 +442,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             }
 
             for (const offer of programOfferedDto!.offers) {
-                await new ProgramOfferedDatasourceImpl().createUpdate(offer.academicPeriod);
+                await new ProgramOfferedDatasourceImpl().createUpdate(offer);
             }
         } catch (error) {
             return CustomError.throwAnError(error) ?? Promise.resolve();

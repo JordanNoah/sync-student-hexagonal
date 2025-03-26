@@ -72,7 +72,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                             await new RabbitProcessorDatasourceImpl().StudentSynchronized(academicRecord)
                             await new RabbitProcessorDatasourceImpl().StudentEnrolled(academicRecord)
                             //actualizar todo a hecho en db
-                            await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
+                            //await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
                         }
                     }
                 }
@@ -89,6 +89,10 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
             
             const educationalSynchro = await new EducationalSynchroDatasourceImpl().getStudent(studentUuid, institution)
             const studentMoodle = StudentToMoodleDto.fromExternal(sgStudent, educationalSynchro)
+            console.log("Student Moodle: ", studentMoodle);
+            console.log("Educational Synchro: ", educationalSynchro);
+            
+            
             
             if (!educationalSynchro) {
                 const moodleStudent = await new ExternalMoodleApiRepository(institution).createStudent(studentMoodle)
@@ -229,6 +233,8 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                 for (const enrollment of academicRecord.inscription.enrollments) {
                     coursesUuids.push(
                         ...enrollment.academicSelections!.flatMap( academicSelection => {
+                            console.log("Academic Selection: ", academicSelection);
+                            
                                 return new CourseUuid(
                                     "course",
                                     academicSelection.academicElementUuid,

@@ -3,6 +3,6 @@ import ProgramOfferedOffertEventDto from "../dtos/programOffered/programOfferedO
 import AcademicPeriodEntity from "../entity/academicPeriod.entity";
 
 export default abstract class ProgramOfferedDatasource {
-    abstract createUpdate(programOffered: ProgramOfferedAcademicPeriodEventDto): Promise<AcademicPeriodEntity>;
+    abstract createUpdate(programOffered: ProgramOfferedOffertEventDto): Promise<AcademicPeriodEntity>;
     abstract findByUuid(uuid: string): Promise<AcademicPeriodEntity | undefined>;
 }

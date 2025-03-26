@@ -24,7 +24,8 @@ export function getOnlyYearAndMonth(date: Date|string): string | null {
         dateToCheck = date
     }
     if (!dateToCheck) return null
-    return `${dateToCheck.getFullYear()}-${dateToCheck.getMonth() + 1}`
+        
+    return `${dateToCheck.getFullYear()}-${String(dateToCheck.getMonth() + 1).padStart(2, '0')}`
 }
 
 export function dateToTimeStamp(date: string | Date): number {
