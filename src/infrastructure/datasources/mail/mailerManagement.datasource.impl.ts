@@ -24,6 +24,7 @@ export class MailerManagmentDatasourceImpl implements MailerManagmentDatasource 
             const studentUuid = academicRecord.inscription.studentUuid
             const studentUsername = student.username
             const program = programCourse.shortName
+            console.log(program)
             const institutionAbbreviation = institution.abbreviation
             const programVersion = academicRecord.inscription.enrollments?.[0].programVersion;
             const programUuid = academicRecord.inscription.enrollments?.[0].programUuid;

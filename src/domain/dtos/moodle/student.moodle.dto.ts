@@ -13,14 +13,14 @@ export default class StudentToMoodleDto {
         public isCreated?: boolean,
     ){}
 
-    static fromExternal(userSgDto:UserSgDto | null, studentEntity:StudentEntity | null ): StudentToMoodleDto {
+    static fromExternal(userSgDto:UserSgDto, studentEntity:StudentEntity | null ): StudentToMoodleDto {
         return new StudentToMoodleDto(
-            userSgDto?.credentials[0]?.username.toLowerCase() || "fakeUsername",
-            userSgDto?.credentials[0]?.password || "fakePassword",
-            userSgDto?.name || "Fake",
-            userSgDto?.lastName || "User",
-            userSgDto?.emails[0]?.email || "fakeuser@example.com",
-            userSgDto?.uuid || "fakeUUID",
+            userSgDto.credentials[0].username.toLowerCase(),
+            userSgDto.credentials[0].password,
+            userSgDto.name,
+            userSgDto.lastName,
+            userSgDto.emails[0].email,
+            userSgDto.uuid,
             studentEntity ? studentEntity.id! : undefined
         )
     }

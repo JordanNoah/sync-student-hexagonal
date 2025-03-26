@@ -73,9 +73,9 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
 
     async syncStudent(studentUuid: string, institution: InstitutionEntity): Promise<StudentToMoodleDto> {
         try {
-            //const sgStudent = await new SgDatasourceImpl().getStudent(studentUuid)
+            const sgStudent = await new SgDatasourceImpl().getStudent(studentUuid)
             const educationalSynchro = await new EducationalSynchroDatasourceImpl().getStudent(studentUuid, institution)
-            const studentMoodle = StudentToMoodleDto.fromExternal(null, educationalSynchro)
+            const studentMoodle = StudentToMoodleDto.fromExternal(sgStudent, educationalSynchro)
             if (!educationalSynchro) {
                 const moodleStudent = await new ExternalMoodleApiRepository(institution).createStudent(studentMoodle)
                 studentMoodle.id = moodleStudent.data[0].id
