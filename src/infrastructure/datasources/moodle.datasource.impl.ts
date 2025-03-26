@@ -72,7 +72,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                             await new RabbitProcessorDatasourceImpl().StudentSynchronized(academicRecord)
                             await new RabbitProcessorDatasourceImpl().StudentEnrolled(academicRecord)
                             //actualizar todo a hecho en db
-                            //await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
+                            await new InscriptionDatasourceImpl().setAcademicRecordPrcessed(academicRecord)
                         }
                     }
                 }
