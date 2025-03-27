@@ -14,6 +14,8 @@ export default class CredentialDto {
         if (!password) return [`password ${messageErrorComplement}`, undefined];
         if(!object['type']) return [`type ${messageErrorComplement}`, undefined];
 
-        return [undefined, new CredentialDto(reference_id, username, password, object['type'])];
+        const passwordDecode = new Buffer(password, 'base64');
+
+        return [undefined, new CredentialDto(reference_id, username, passwordDecode.toString(), object['type'])];
     }
 }
