@@ -59,6 +59,10 @@ const appConstants = {
     INSCRIPTIONSTATUS: {
         ACTIVATED: 'AC',
         WITHDRAWN: 'WD'
+    },
+    INSCRIPTIONMODALITY: {
+        PRESENTIAL: '_PRESENTIAL',
+        VIRTUAL: '_VIRTUAL'
     }
 } as const;
 

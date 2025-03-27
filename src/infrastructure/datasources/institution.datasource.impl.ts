@@ -4,6 +4,7 @@ import InstitutionEntity from "@/domain/entity/institution.entity";
 import { CustomError } from "@/domain/errors/custom.error";
 import { InstitutionSequelize } from "../database/models";
 import InstitutionDto from "@/domain/dtos/institution/institution.dto";
+import appConstants from "@/shared/constants";
 
 export default class InstitutionDatasourceImpl implements InstitutionDatasource {
     async getByAbbreviation(abbreviation: string): Promise<InstitutionEntity | null> {
@@ -21,29 +22,38 @@ export default class InstitutionDatasourceImpl implements InstitutionDatasource 
             return Promise.reject(error);
         }
     }
-    async getByDegrees(degrees: DegreeEntity[]): Promise<InstitutionEntity | null> {
+    async getByDegrees(degrees: DegreeEntity[], modality: string): Promise<InstitutionEntity | null> {
         try {
             let institutionEntity: InstitutionEntity | null = null
-            for (const degree of degrees) {                
-                const institution = await this.getByAbbreviation(degree.instituionComing);
-                
-                if (institution){
-                    degree.institution = institution;
-                    if (institution.abbreviation.toUpperCase() === "UNIB") {
-                        institutionEntity = institution;
-                        break;
-                    }
-                    if (institution.parent) {
-                        const parent = await this.getById(institution.parent);
-                        if (parent) {
-                            institutionEntity = parent;
+            if (modality == appConstants.INSCRIPTIONMODALITY.VIRTUAL) {
+                for (const degree of degrees) {                
+                    const institution = await this.getByAbbreviation(degree.instituionComing);
+                    
+                    if (institution){
+                        degree.institution = institution;
+                        if (institution.abbreviation.toUpperCase() === "UNIB") {
+                            institutionEntity = institution;
+                            break;
                         }
-                    }else{
+                        if (institution.parent) {
+                            const parent = await this.getById(institution.parent);
+                            if (parent) {
+                                institutionEntity = parent;
+                            }
+                        }else{
+                            institutionEntity = institution;
+                        }
+                    }
+                }
+            } else {
+                for (const degree of degrees) {
+                    const institution = await this.getByAbbreviation(degree.instituionComing);
+                    if (institution) {
+                        degree.institution = institution;
                         institutionEntity = institution;
                     }
                 }
             }
-            
             return institutionEntity;
         } catch (error) {
             CustomError.throwAnError(error)

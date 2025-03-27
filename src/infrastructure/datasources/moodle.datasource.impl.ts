@@ -31,7 +31,7 @@ import DegreeEntity from "@/domain/entity/degree.entity";
 export default class MoodleDatasourceImpl implements MoodleDatasource {
     async enrollFromAcademicRecord(academicRecord: AcademicRecordEntity): Promise<void> {
         try {
-            const institution = await new InstitutionDatasourceImpl().getByDegrees(academicRecord.inscription.degrees!)
+            const institution = await new InstitutionDatasourceImpl().getByDegrees(academicRecord.inscription.degrees!, academicRecord.inscription.modality)
             console.log("Institution found: ", institution?.abbreviation);
             
                 if (institution) {
@@ -169,7 +169,7 @@ export default class MoodleDatasourceImpl implements MoodleDatasource {
                 throw CustomError.internalServer("Degree not found")
             }
             
-            const institution = await new InstitutionDatasourceImpl().getByDegrees(degrees)
+            const institution = await new InstitutionDatasourceImpl().getByDegrees(degrees, inscription.modality)
             if(!institution){
                 throw CustomError.internalServer("Institution not found")
             }
