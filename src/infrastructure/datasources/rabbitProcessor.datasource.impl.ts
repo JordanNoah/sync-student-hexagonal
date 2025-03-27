@@ -128,8 +128,8 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
 
             if (inscription && inscription.processed) {
                 const newDegrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscription.uuid);
-                const actualInstitution = await new InstitutionDatasourceImpl().getByDegrees(oldDegrees);
-                const newInstitution = await new InstitutionDatasourceImpl().getByDegrees(newDegrees);
+                const actualInstitution = await new InstitutionDatasourceImpl().getByDegrees(oldDegrees, inscription.modality);
+                const newInstitution = await new InstitutionDatasourceImpl().getByDegrees(newDegrees, inscription.modality);
 
                 if(actualInstitution?.abbreviation !== newInstitution?.abbreviation) {
                     const student = await new MoodleDatasourceImpl().syncStudent(inscription.studentUuid, actualInstitution!)
@@ -199,8 +199,8 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             const newDegree = await new DegreeDatasourceImpl().createUpdate(degreeEventDto!);
 
             if (oldDegrees.length > 0) {
-                const actualInstitution = await new InstitutionDatasourceImpl().getByDegrees(oldDegrees);
-                const newInstitution = await new InstitutionDatasourceImpl().getByDegrees([newDegree, ...oldDegrees]);
+                const actualInstitution = await new InstitutionDatasourceImpl().getByDegrees(oldDegrees, inscription!.modality);
+                const newInstitution = await new InstitutionDatasourceImpl().getByDegrees([newDegree, ...oldDegrees], inscription!.modality);
                 if(actualInstitution?.abbreviation !== newInstitution?.abbreviation) {
                     const inscription = await new InscriptionDatasourceImpl().getByUuid(newDegree.inscriptionUuid);
                     if (inscription) {
@@ -254,8 +254,8 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
 
             if (inscription && inscription.processed) {
                 const newDegrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscription.uuid);
-                const actualInstitution = await new InstitutionDatasourceImpl().getByDegrees(oldDegrees);
-                const newInstitution = await new InstitutionDatasourceImpl().getByDegrees(newDegrees);
+                const actualInstitution = await new InstitutionDatasourceImpl().getByDegrees(oldDegrees, inscription.modality);
+                const newInstitution = await new InstitutionDatasourceImpl().getByDegrees(newDegrees, inscription.modality);
 
                 if(actualInstitution?.abbreviation !== newInstitution?.abbreviation) {
                     const student = await new MoodleDatasourceImpl().syncStudent(inscription.studentUuid, actualInstitution!)
@@ -369,7 +369,7 @@ export default class RabbitProcessorDatasourceImpl implements RabbitProcessorDat
             inscriptionEntity.status = appConstants.INSCRIPTIONSTATUS.WITHDRAWN;
 
             const degrees = await new DegreeDatasourceImpl().getByInscriptionUuid(inscriptionEntity.uuid);
-            const institution = await new InstitutionDatasourceImpl().getByDegrees(degrees);
+            const institution = await new InstitutionDatasourceImpl().getByDegrees(degrees, inscriptionEntity.modality);
             if(inscriptionEntity.processed && degrees.length > 0){
                 //curso compartido
             }
